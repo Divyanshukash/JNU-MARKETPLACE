@@ -32,25 +32,20 @@ public class ListingRequest {
     private String subCategory;
     private Listing.Condition condition;
 
-    @NotNull(message = "Listing type is required")
-    private Listing.ListingType listingType;
-
     private List<String> images;
     private String location;
     private String hostelBlock;
     private String roomNumber;
-    private Listing.ContactPreference contactPreference = Listing.ContactPreference.IN_APP;
     private List<String> tags;
 
     // Constructors
     public ListingRequest() {}
 
-    public ListingRequest(String title, String description, BigDecimal price, String category, Listing.ListingType listingType) {
+    public ListingRequest(String title, String description, BigDecimal price, String category) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.category = category;
-        this.listingType = listingType;
     }
 
     // Getters and Setters
@@ -118,14 +113,6 @@ public class ListingRequest {
         this.condition = condition;
     }
 
-    public Listing.ListingType getListingType() {
-        return listingType;
-    }
-
-    public void setListingType(Listing.ListingType listingType) {
-        this.listingType = listingType;
-    }
-
     public List<String> getImages() {
         return images;
     }
@@ -158,14 +145,6 @@ public class ListingRequest {
         this.roomNumber = roomNumber;
     }
 
-    public Listing.ContactPreference getContactPreference() {
-        return contactPreference;
-    }
-
-    public void setContactPreference(Listing.ContactPreference contactPreference) {
-        this.contactPreference = contactPreference;
-    }
-
     public List<String> getTags() {
         return tags;
     }
@@ -180,7 +159,6 @@ public class ListingRequest {
                 "title='" + title + '\'' +
                 ", price=" + price +
                 ", category='" + category + '\'' +
-                ", listingType=" + listingType +
                 ", negotiable=" + negotiable +
                 '}';
     }

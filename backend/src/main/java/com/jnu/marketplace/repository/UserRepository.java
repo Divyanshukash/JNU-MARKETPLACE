@@ -26,20 +26,12 @@ public interface UserRepository extends MongoRepository<User, String> {
     // Authentication methods
     Optional<User> findByEmail(String email);
     
-    Optional<User> findByEmailAndEmailVerifiedTrue(String email);
-    
-    Optional<User> findByEmailVerificationToken(String token);
-    
     Optional<User> findByResetPasswordToken(String token);
     
     boolean existsByEmail(String email);
-    
-    boolean existsByEmailAndEmailVerifiedTrue(String email);
 
     // User status methods
     List<User> findByStatus(User.UserStatus status);
-    
-    List<User> findByEmailVerified(boolean emailVerified);
     
     List<User> findByAccountLockedTrue();
     
@@ -74,7 +66,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     // Rating and activity methods
     List<User> findByRatingGreaterThanEqual(double rating);
     
-    List<User> findByTotalTransactionsGreaterThan(int minTransactions);
+
     
     List<User> findByTotalRatingsGreaterThan(int minRatings);
     
@@ -98,12 +90,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     List<User> findUsersRegisteredBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     // Verification methods
-    List<User> findByEmailVerifiedFalse();
-    
-    List<User> findByEmailVerifiedFalseAndCreatedAtBefore(LocalDateTime dateTime);
-    
-    List<User> findByEmailVerificationExpiresBefore(LocalDateTime dateTime);
-    
     List<User> findByResetPasswordExpiresBefore(LocalDateTime dateTime);
 
     // Login attempt methods
@@ -138,21 +124,20 @@ public interface UserRepository extends MongoRepository<User, String> {
     List<User> findUsersWithFollowers();
 
     // Complex queries
-    @Query("{'$and': [{'status': 'ACTIVE'}, {'emailVerified': true}, {'role': ?0}]}")
-    Page<User> findActiveVerifiedUsersByRole(User.UserRole role, Pageable pageable);
+    @Query("{'$and': [{'status': 'ACTIVE'}, {'role': ?0}]}")
+    Page<User> findActiveUsersByRole(User.UserRole role, Pageable pageable);
     
-    @Query("{'$and': [{'status': 'ACTIVE'}, {'emailVerified': true}, {'rating': {'$gte': ?0}}, {'totalRatings': {'$gte': ?1}}]}")
+    @Query("{'$and': [{'status': 'ACTIVE'}, {'rating': {'$gte': ?0}}, {'totalRatings': {'$gte': ?1}}]}")
     Page<User> findTopRatedUsers(double minRating, int minRatings, Pageable pageable);
     
-    @Query("{'$and': [{'status': 'ACTIVE'}, {'emailVerified': true}, {'totalTransactions': {'$gte': ?0}}]}")
-    Page<User> findMostActiveUsers(int minTransactions, Pageable pageable);
+
 
     // Statistics methods
     long countByStatus(User.UserStatus status);
     
     long countByRole(User.UserRole role);
     
-    long countByEmailVerified(boolean emailVerified);
+
     
     long countByDepartment(String department);
     
@@ -164,6 +149,5 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query(value = "{}", fields = "{'department': 1, 'role': 1, 'status': 1}")
     List<User> findUserStats();
     
-    @Query(value = "{'status': 'ACTIVE'}", fields = "{'rating': 1, 'totalRatings': 1, 'totalTransactions': 1}")
-    List<User> findActiveUserMetrics();
+
 } 

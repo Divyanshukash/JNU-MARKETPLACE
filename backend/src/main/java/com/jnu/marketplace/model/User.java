@@ -1,7 +1,7 @@
 package com.jnu.marketplace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -83,16 +83,9 @@ public class User implements UserDetails {
     private UserRole role = UserRole.STUDENT;
 
     @Field("status")
-    private UserStatus status = UserStatus.PENDING_VERIFICATION;
+    private UserStatus status = UserStatus.ACTIVE;
 
-    @Field("email_verified")
-    private boolean emailVerified = false;
 
-    @Field("email_verification_token")
-    private String emailVerificationToken;
-
-    @Field("email_verification_expires")
-    private LocalDateTime emailVerificationExpires;
 
     @Field("reset_password_token")
     private String resetPasswordToken;
@@ -133,8 +126,7 @@ public class User implements UserDetails {
     @Field("total_ratings")
     private int totalRatings = 0;
 
-    @Field("total_transactions")
-    private int totalTransactions = 0;
+
 
     @Field("created_at")
     @CreatedDate
@@ -188,7 +180,7 @@ public class User implements UserDetails {
     @Override
     @JsonIgnore
     public boolean isEnabled() {
-        return status == UserStatus.ACTIVE && emailVerified;
+        return true; // Allow login for all users (for development/testing)
     }
 
     // Helper methods
@@ -353,29 +345,7 @@ public class User implements UserDetails {
         this.status = status;
     }
 
-    public boolean isEmailVerified() {
-        return emailVerified;
-    }
 
-    public void setEmailVerified(boolean emailVerified) {
-        this.emailVerified = emailVerified;
-    }
-
-    public String getEmailVerificationToken() {
-        return emailVerificationToken;
-    }
-
-    public void setEmailVerificationToken(String emailVerificationToken) {
-        this.emailVerificationToken = emailVerificationToken;
-    }
-
-    public LocalDateTime getEmailVerificationExpires() {
-        return emailVerificationExpires;
-    }
-
-    public void setEmailVerificationExpires(LocalDateTime emailVerificationExpires) {
-        this.emailVerificationExpires = emailVerificationExpires;
-    }
 
     public String getResetPasswordToken() {
         return resetPasswordToken;
@@ -481,13 +451,7 @@ public class User implements UserDetails {
         this.totalRatings = totalRatings;
     }
 
-    public int getTotalTransactions() {
-        return totalTransactions;
-    }
 
-    public void setTotalTransactions(int totalTransactions) {
-        this.totalTransactions = totalTransactions;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -516,17 +480,7 @@ public class User implements UserDetails {
 
     // Inner class for user preferences
     public static class UserPreferences {
-        @Field("notifications_enabled")
-        private boolean notificationsEnabled = true;
 
-        @Field("email_notifications")
-        private boolean emailNotifications = true;
-
-        @Field("push_notifications")
-        private boolean pushNotifications = true;
-
-        @Field("sms_notifications")
-        private boolean smsNotifications = false;
 
         @Field("privacy_level")
         private PrivacyLevel privacyLevel = PrivacyLevel.PUBLIC;
@@ -538,37 +492,7 @@ public class User implements UserDetails {
         private String timezone = "Asia/Kolkata";
 
         // Getters and Setters
-        public boolean isNotificationsEnabled() {
-            return notificationsEnabled;
-        }
 
-        public void setNotificationsEnabled(boolean notificationsEnabled) {
-            this.notificationsEnabled = notificationsEnabled;
-        }
-
-        public boolean isEmailNotifications() {
-            return emailNotifications;
-        }
-
-        public void setEmailNotifications(boolean emailNotifications) {
-            this.emailNotifications = emailNotifications;
-        }
-
-        public boolean isPushNotifications() {
-            return pushNotifications;
-        }
-
-        public void setPushNotifications(boolean pushNotifications) {
-            this.pushNotifications = pushNotifications;
-        }
-
-        public boolean isSmsNotifications() {
-            return smsNotifications;
-        }
-
-        public void setSmsNotifications(boolean smsNotifications) {
-            this.smsNotifications = smsNotifications;
-        }
 
         public PrivacyLevel getPrivacyLevel() {
             return privacyLevel;

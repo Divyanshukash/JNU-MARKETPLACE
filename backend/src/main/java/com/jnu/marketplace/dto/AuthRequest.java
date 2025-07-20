@@ -18,8 +18,6 @@ public class AuthRequest {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be a valid email address")
-    @Pattern(regexp = ".*@(jnu\\.ac\\.in|mail\\.jnu\\.ac\\.in|students\\.jnu\\.ac\\.in)$", 
-             message = "Email must be a valid JNU email address")
     private String email;
 
     @NotBlank(message = "Password is required")

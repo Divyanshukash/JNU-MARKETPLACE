@@ -3,7 +3,6 @@ package com.jnu.marketplace.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jnu.marketplace.model.User;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * Authentication response DTO for login and registration responses
@@ -149,7 +148,7 @@ public class AuthResponse {
         private boolean emailVerified;
         private double rating;
         private int totalRatings;
-        private int totalTransactions;
+    
         private LocalDateTime lastLogin;
         private LocalDateTime createdAt;
 
@@ -169,10 +168,10 @@ public class AuthResponse {
             this.facultyId = user.getFacultyId();
             this.role = user.getRole().name();
             this.status = user.getStatus().name();
-            this.emailVerified = user.isEmailVerified();
+            this.emailVerified = true; // All users are considered verified
             this.rating = user.getRating();
             this.totalRatings = user.getTotalRatings();
-            this.totalTransactions = user.getTotalTransactions();
+
             this.lastLogin = user.getLastLogin();
             this.createdAt = user.getCreatedAt();
         }
@@ -298,13 +297,7 @@ public class AuthResponse {
             this.totalRatings = totalRatings;
         }
 
-        public int getTotalTransactions() {
-            return totalTransactions;
-        }
 
-        public void setTotalTransactions(int totalTransactions) {
-            this.totalTransactions = totalTransactions;
-        }
 
         public LocalDateTime getLastLogin() {
             return lastLogin;

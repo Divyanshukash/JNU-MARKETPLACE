@@ -7,7 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,7 +52,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(user.getWishlist());
+        return ResponseEntity.ok(new ArrayList<>(user.getWishlist()));
     }
 
     @PostMapping("/wishlist/{listingId}")
@@ -94,5 +101,34 @@ public class UserController {
     public ResponseEntity<List<User>> getFollowing() {
         // Implementation for getting following
         return ResponseEntity.ok(List.of());
+    }
+
+    @PostMapping("/upload-profile-picture")
+    public ResponseEntity<?> uploadProfilePicture(@RequestParam("file") MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userService.getUserByEmail(email);
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file uploaded");
+        }
+        // Only allow certain file types
+        String contentType = file.getContentType();
+        if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png") || contentType.equals("image/gif") || contentType.equals("image/webp"))) {
+            return ResponseEntity.badRequest().body("Invalid file type");
+        }
+        // Save file to /uploads/profile-pictures/
+        String uploadDir = "uploads/profile-pictures/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        String originalFilename = file.getOriginalFilename();
+        String ext = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf('.')) : ".png";
+        String filename = UUID.randomUUID() + ext;
+        Path filepath = Paths.get(uploadDir, filename);
+        Files.copy(file.getInputStream(), filepath);
+        // Update user profile
+        user.setProfilePicture("/uploads/profile-pictures/" + filename);
+        userService.saveUser(user);
+        return ResponseEntity.ok(user.getProfilePicture());
     }
 } 

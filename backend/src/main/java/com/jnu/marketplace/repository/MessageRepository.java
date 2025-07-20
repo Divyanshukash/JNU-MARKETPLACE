@@ -142,16 +142,9 @@ public interface MessageRepository extends MongoRepository<Message, String> {
     List<Message> findBySenderIdAndEditedTrue(String senderId);
 
     // Dismissed messages
-    List<Message> findByReceiverIdAndDismissedTrue(String receiverId);
     
-    @Query("{'receiverId': ?0, 'dismissed': true, 'dismissedAt': {'$gt': ?1}}")
-    List<Message> findDismissedMessagesAfter(String receiverId, LocalDateTime since);
 
-    // Clicked messages
-    List<Message> findByReceiverIdAndClickedTrue(String receiverId);
     
-    @Query("{'receiverId': ?0, 'clicked': true, 'clickedAt': {'$gt': ?1}}")
-    List<Message> findClickedMessagesAfter(String receiverId, LocalDateTime since);
 
     // Complex queries
     @Query("{'$and': [{'$or': [{'senderId': ?0}, {'receiverId': ?0}]}, {'messageType': ?1}, {'createdAt': {'$gt': ?2}}]}")
@@ -198,8 +191,7 @@ public interface MessageRepository extends MongoRepository<Message, String> {
     long countRecentMessagesBetweenUsers(String userId1, String userId2, LocalDateTime since);
 
     // Unread conversation counts
-    @Query("{'receiverId': ?0, 'read': false, 'senderId': ?1}")
-    long countUnreadMessagesFromSender(String receiverId, String senderId);
+    long countByReceiverIdAndReadFalseAndSenderId(String receiverId, String senderId);
     
     @Query("{'receiverId': ?0, 'read': false, 'listingId': ?1}")
     long countUnreadMessagesForListing(String receiverId, String listingId);

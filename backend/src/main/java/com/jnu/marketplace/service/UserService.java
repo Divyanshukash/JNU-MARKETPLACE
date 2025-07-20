@@ -3,8 +3,6 @@ package com.jnu.marketplace.service;
 import com.jnu.marketplace.dto.AuthRequest;
 import com.jnu.marketplace.dto.AuthResponse;
 import com.jnu.marketplace.model.User;
-import com.jnu.marketplace.model.UserRole;
-import com.jnu.marketplace.model.UserStatus;
 import com.jnu.marketplace.repository.UserRepository;
 import com.jnu.marketplace.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,6 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final EmailService emailService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -40,36 +37,25 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("User already exists with email: " + request.getEmail());
         }
 
-        // Validate JNU email domain
-        if (!isValidJnuEmail(request.getEmail())) {
-            throw new RuntimeException("Only JNU email addresses are allowed");
-        }
-
         // Create new user
-        User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .phone(request.getPhone())
-                .role(UserRole.USER)
-                .status(UserStatus.PENDING_VERIFICATION)
-                .build();
+        User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setRole(User.UserRole.STUDENT);
+        user.setStatus(User.UserStatus.ACTIVE);
 
         userRepository.save(user);
 
-        // Send verification email
-        emailService.sendVerificationEmail(user);
+
 
         // Generate JWT token
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        return AuthResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .user(user)
-                .build();
+        return AuthResponse.success(jwtToken, refreshToken, new AuthResponse.UserDto(user));
     }
 
     public AuthResponse authenticate(AuthRequest request) {
@@ -83,18 +69,12 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new RuntimeException("Account is not active. Please verify your email first.");
-        }
+        // Removed status check to allow login for all users
 
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        return AuthResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .user(user)
-                .build();
+        return AuthResponse.success(jwtToken, refreshToken, new AuthResponse.UserDto(user));
     }
 
     public User updateProfile(String email, User userDetails) {
@@ -103,7 +83,7 @@ public class UserService implements UserDetailsService {
 
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
-        user.setPhone(userDetails.getPhone());
+        user.setPhoneNumber(userDetails.getPhoneNumber());
         user.setBio(userDetails.getBio());
         user.setProfilePicture(userDetails.getProfilePicture());
         user.setPreferences(userDetails.getPreferences());
@@ -121,10 +101,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public void verifyEmail(String token) {
-        // Implementation for email verification
-        // This would typically involve decoding the token and updating user status
-    }
+
 
     public void changePassword(String email, String oldPassword, String newPassword) {
         User user = userRepository.findByEmail(email)
@@ -156,18 +133,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    private boolean isValidJnuEmail(String email) {
-        String[] validDomains = {
-                "@jnu.ac.in",
-                "@mail.jnu.ac.in",
-                "@students.jnu.ac.in"
-        };
-
-        for (String domain : validDomains) {
-            if (email.toLowerCase().endsWith(domain)) {
-                return true;
-            }
-        }
-        return false;
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 } 

@@ -15,7 +15,7 @@
     <groupId>com.jnu</groupId>
     <artifactId>marketplace</artifactId>
     <version>1.0.0</version>
-    <name>JNU Marketplace</name>
+    <name>JNU BAZAAR</name>
     <description>Buy and sell platform for JNU community</description>
 
     <properties>
@@ -50,15 +50,9 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
+
         
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+
 
         <!-- JWT -->
         <dependency>
@@ -77,13 +71,6 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.3</version>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- Stripe Payment -->
-        <dependency>
-            <groupId>com.stripe</groupId>
-            <artifactId>stripe-java</artifactId>
-            <version>24.8.0</version>
         </dependency>
 
         <!-- Swagger/OpenAPI -->
@@ -122,7 +109,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version> <!-- Use the latest stable version -->
+            
             <scope>provided</scope>
         </dependency>
 

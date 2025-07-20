@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { AuthRequest, AuthResponse, User } from '../types';
 
+// API_BASE_URL is set to http://localhost:8080/api by default for local development
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
 // Create axios instance with base configuration
@@ -97,9 +98,7 @@ export const authService = {
     });
   },
 
-  async verifyEmail(token: string): Promise<void> {
-    await api.post('/auth/verify-email', { token });
-  },
+
 
   logout(): void {
     localStorage.removeItem('accessToken');

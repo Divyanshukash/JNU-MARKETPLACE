@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -15,18 +15,32 @@ import Profile from './pages/Profile';
 import Search from './pages/Search';
 import Messages from './pages/Messages';
 import Wishlist from './pages/Wishlist';
+import SaleRequests from './pages/SaleRequests';
+import About from './pages/About';
 
 function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-gray-100">
+        <Navbar theme={theme} setTheme={setTheme} />
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/about" element={<About />} />
             <Route path="/listings/:id" element={<ListingDetail />} />
             
             {/* Protected Routes */}
@@ -53,6 +67,11 @@ function App() {
             <Route path="/wishlist" element={
               <PrivateRoute>
                 <Wishlist />
+              </PrivateRoute>
+            } />
+            <Route path="/sale-requests" element={
+              <PrivateRoute>
+                <SaleRequests />
               </PrivateRoute>
             } />
           </Routes>

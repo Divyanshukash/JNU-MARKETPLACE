@@ -9,13 +9,11 @@ public class SearchRequest {
     private String keyword;
     private String category;
     private String subCategory;
-    private Listing.ListingType listingType;
     private Listing.Condition condition;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private String location;
     private String hostelBlock;
-    private Listing.AvailabilityStatus availabilityStatus;
     private boolean negotiable;
     private boolean featured;
     private boolean urgent;
@@ -58,14 +56,6 @@ public class SearchRequest {
         this.subCategory = subCategory;
     }
 
-    public Listing.ListingType getListingType() {
-        return listingType;
-    }
-
-    public void setListingType(Listing.ListingType listingType) {
-        this.listingType = listingType;
-    }
-
     public Listing.Condition getCondition() {
         return condition;
     }
@@ -104,14 +94,6 @@ public class SearchRequest {
 
     public void setHostelBlock(String hostelBlock) {
         this.hostelBlock = hostelBlock;
-    }
-
-    public Listing.AvailabilityStatus getAvailabilityStatus() {
-        return availabilityStatus;
-    }
-
-    public void setAvailabilityStatus(Listing.AvailabilityStatus availabilityStatus) {
-        this.availabilityStatus = availabilityStatus;
     }
 
     public boolean isNegotiable() {
@@ -196,9 +178,9 @@ public class SearchRequest {
     }
 
     public boolean hasFilters() {
-        return category != null || subCategory != null || listingType != null || 
+        return category != null || subCategory != null || 
                condition != null || hasPriceRange() || location != null || 
-               hostelBlock != null || availabilityStatus != null || 
+               hostelBlock != null || 
                negotiable || featured || urgent || (tags != null && !tags.isEmpty());
     }
 

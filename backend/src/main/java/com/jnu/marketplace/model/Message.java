@@ -1,6 +1,6 @@
 package com.jnu.marketplace.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Message entity for real-time communication between users
+ * Message entity for communication between users
  * 
  * This entity handles messaging between buyers and sellers,
- * including text messages, images, and system notifications.
+ * including text messages and images.
  * 
  * @author JNU Marketplace Team
  * @version 1.0.0

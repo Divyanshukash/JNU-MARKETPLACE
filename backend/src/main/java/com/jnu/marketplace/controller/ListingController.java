@@ -3,7 +3,7 @@ package com.jnu.marketplace.controller;
 import com.jnu.marketplace.dto.ListingRequest;
 import com.jnu.marketplace.dto.SearchRequest;
 import com.jnu.marketplace.model.Listing;
-import com.jnu.marketplace.model.ListingStatus;
+import com.jnu.marketplace.model.Listing.ListingStatus;
 import com.jnu.marketplace.service.ListingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,9 +11,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/listings")
@@ -51,10 +62,13 @@ public class ListingController {
     @GetMapping
     public ResponseEntity<Page<Listing>> getAllListings(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "false") boolean includeSold
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Listing> listings = listingService.getAllListings(pageable);
+        Page<Listing> listings = includeSold ? 
+            listingService.getAllListings(pageable) : 
+            listingService.getActiveListings(pageable);
         return ResponseEntity.ok(listings);
     }
 
@@ -64,8 +78,14 @@ public class ListingController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
+        System.out.println("Search request received: " + request);
+        System.out.println("Page: " + page + ", Size: " + size);
+        
         Pageable pageable = PageRequest.of(page, size);
         Page<Listing> listings = listingService.searchListings(request, pageable);
+        
+        System.out.println("Search results: " + listings.getTotalElements() + " total, " + listings.getContent().size() + " in page");
+        
         return ResponseEntity.ok(listings);
     }
 
@@ -120,13 +140,30 @@ public class ListingController {
         return ResponseEntity.ok("Removed from favorites");
     }
 
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty");
+        }
+        String uploadsDir = "uploads/";
+        File dir = new File(uploadsDir);
+        if (!dir.exists()) dir.mkdirs();
+        String ext = Optional.ofNullable(file.getOriginalFilename())
+            .filter(f -> f.contains("."))
+            .map(f -> f.substring(f.lastIndexOf('.')))
+            .orElse("");
+        String filename = UUID.randomUUID() + ext;
+        Path filePath = Paths.get(uploadsDir, filename);
+        Files.write(filePath, file.getBytes());
+        String fileUrl = "/uploads/" + filename;
+        return ResponseEntity.ok(fileUrl);
+    }
+
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getCategories() {
-        // Return list of available categories
-        List<String> categories = List.of(
-                "Books", "Electronics", "Furniture", "Clothing", "Sports",
-                "Services", "Tutoring", "Transportation", "Food", "Other"
-        );
+        List<String> categories = Arrays.stream(Listing.Category.values())
+            .map(Listing.Category::getDisplayName)
+            .collect(Collectors.toList());
         return ResponseEntity.ok(categories);
     }
 

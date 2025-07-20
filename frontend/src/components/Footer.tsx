@@ -13,22 +13,16 @@ const Footer: React.FC = () => {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">JNU</span>
               </div>
-              <span className="text-xl font-bold">Marketplace</span>
+              <span className="text-xl font-bold">BAZAAR</span>
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
-              The official marketplace for Jawaharlal Nehru University community. 
+              The official bazaar for Jawaharlal Nehru University community. 
               Buy, sell, and trade items and services within the campus ecosystem.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
+              <span className="text-gray-400 text-sm">
+                Connect with us on social media
+              </span>
             </div>
           </div>
 
@@ -51,16 +45,6 @@ const Footer: React.FC = () => {
                   Sell Items
                 </Link>
               </li>
-              <li>
-                <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/help" className="text-gray-300 hover:text-white transition-colors">
-                  Help & Support
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -74,7 +58,7 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Mail className="h-4 w-4" />
-                <span>support@jnu-marketplace.com</span>
+                <span>support@jnu-bazaar.com</span>
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Phone className="h-4 w-4" />
@@ -88,18 +72,12 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 JNU Marketplace. All rights reserved.
+              © 2024 JNU BAZAAR. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Terms of Service
-              </Link>
-              <Link to="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Cookie Policy
-              </Link>
+              <span className="text-gray-400 text-sm">
+                Made with ❤️ for JNU Community
+              </span>
             </div>
           </div>
         </div>

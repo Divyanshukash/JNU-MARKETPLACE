@@ -29,11 +29,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
-        userService.verifyEmail(token);
-        return ResponseEntity.ok("Email verified successfully");
-    }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {

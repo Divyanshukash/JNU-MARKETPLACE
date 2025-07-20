@@ -32,20 +32,9 @@ export enum UserStatus {
 }
 
 export interface UserPreferences {
-  notifications: NotificationPreferences;
   privacy: PrivacySettings;
   theme: 'light' | 'dark';
   language: string;
-}
-
-export interface NotificationPreferences {
-  email: boolean;
-  push: boolean;
-  sms: boolean;
-  newMessages: boolean;
-  newOffers: boolean;
-  priceChanges: boolean;
-  systemUpdates: boolean;
 }
 
 export interface PrivacySettings {
@@ -124,107 +113,12 @@ export interface Attachment {
   mimeType: string;
 }
 
-export interface Transaction {
-  id: string;
-  listing: Listing;
-  buyer: User;
-  seller: User;
-  amount: number;
-  currency: string;
-  status: TransactionStatus;
-  paymentMethod: PaymentMethod;
-  paymentDetails: PaymentDetails;
-  deliveryDetails: DeliveryDetails;
-  disputeDetails?: DisputeDetails;
-  refundDetails?: RefundDetails;
-  review?: Review;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export enum TransactionStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  SHIPPED = 'SHIPPED',
-  DELIVERED = 'DELIVERED',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  DISPUTED = 'DISPUTED',
-  REFUNDED = 'REFUNDED'
-}
-
-export enum PaymentMethod {
-  STRIPE = 'STRIPE',
-  PAYPAL = 'PAYPAL',
-  UPI = 'UPI',
-  CASH = 'CASH'
-}
-
-export interface PaymentDetails {
-  transactionId: string;
-  paymentStatus: string;
-  paymentDate: string;
-  processingFee: number;
-}
-
-export interface DeliveryDetails {
-  trackingNumber?: string;
-  carrier?: string;
-  estimatedDelivery?: string;
-  actualDelivery?: string;
-  deliveryAddress: Location;
-}
-
-export interface DisputeDetails {
-  reason: string;
-  description: string;
-  evidence: string[];
-  status: 'OPEN' | 'RESOLVED' | 'CLOSED';
-  resolution?: string;
-}
-
-export interface RefundDetails {
-  amount: number;
-  reason: string;
-  processedDate: string;
-  refundMethod: string;
-}
-
 export interface Review {
   id: string;
   rating: number;
   comment: string;
   anonymous: boolean;
   createdAt: string;
-}
-
-export interface Notification {
-  id: string;
-  recipient: User;
-  type: NotificationType;
-  title: string;
-  message: string;
-  priority: NotificationPriority;
-  read: boolean;
-  delivered: boolean;
-  metadata: Record<string, any>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export enum NotificationType {
-  MESSAGE = 'MESSAGE',
-  OFFER = 'OFFER',
-  TRANSACTION = 'TRANSACTION',
-  SYSTEM = 'SYSTEM',
-  SECURITY = 'SECURITY'
-}
-
-export enum NotificationPriority {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  URGENT = 'URGENT'
 }
 
 // API Request/Response Types
@@ -237,9 +131,10 @@ export interface AuthRequest {
 }
 
 export interface AuthResponse {
-  accessToken: string;
+  token: string;
   refreshToken: string;
   user: User;
+  accessToken?: string; // for backward compatibility, but not used
 }
 
 export interface ListingRequest {
