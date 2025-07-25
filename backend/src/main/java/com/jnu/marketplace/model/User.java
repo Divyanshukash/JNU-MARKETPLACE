@@ -79,6 +79,9 @@ public class User implements UserDetails {
     @Field("faculty_id")
     private String facultyId;
 
+    @Field("address")
+    private String address;
+
     @Field("role")
     private UserRole role = UserRole.STUDENT;
 
@@ -126,6 +129,8 @@ public class User implements UserDetails {
     @Field("total_ratings")
     private int totalRatings = 0;
 
+    @Field("qr_code_image")
+    private String qrCodeImage;
 
 
     @Field("created_at")
@@ -329,6 +334,13 @@ public class User implements UserDetails {
         this.facultyId = facultyId;
     }
 
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public UserRole getRole() {
         return role;
     }
@@ -451,6 +463,12 @@ public class User implements UserDetails {
         this.totalRatings = totalRatings;
     }
 
+    public String getQrCodeImage() {
+        return qrCodeImage;
+    }
+    public void setQrCodeImage(String qrCodeImage) {
+        this.qrCodeImage = qrCodeImage;
+    }
 
 
     public LocalDateTime getCreatedAt() {

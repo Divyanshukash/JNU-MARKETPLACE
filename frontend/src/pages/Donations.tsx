@@ -35,7 +35,7 @@ const Donations: React.FC = () => {
               )}
               <div className="flex items-center mb-2">
                 <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">Free/Donation</span>
-                <span className="text-lg font-semibold text-gray-900 dark:text-white">{listing.title}</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-primary-200">{listing.title}</span>
               </div>
               <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">{listing.description}</p>
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">Category: {listing.category}</div>

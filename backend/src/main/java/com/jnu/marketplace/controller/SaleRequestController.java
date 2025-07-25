@@ -43,8 +43,14 @@ public class SaleRequestController {
             BigDecimal deliveryCost = request.get("deliveryCost") != null ? 
                 new BigDecimal(request.get("deliveryCost").toString()) : BigDecimal.ZERO;
 
-            Sale.PaymentMethod paymentMethod = Sale.PaymentMethod.valueOf(paymentMethodStr.toUpperCase());
-            Sale.DeliveryMethod deliveryMethod = Sale.DeliveryMethod.valueOf(deliveryMethodStr.toUpperCase());
+            Sale.PaymentMethod paymentMethod = null;
+            Sale.DeliveryMethod deliveryMethod = null;
+            if (paymentMethodStr != null && !paymentMethodStr.isBlank()) {
+                paymentMethod = Sale.PaymentMethod.valueOf(paymentMethodStr.toUpperCase());
+            }
+            if (deliveryMethodStr != null && !deliveryMethodStr.isBlank()) {
+                deliveryMethod = Sale.DeliveryMethod.valueOf(deliveryMethodStr.toUpperCase());
+            }
 
             SaleRequest saleRequest = saleRequestService.createSaleRequest(
                 listingId, buyer.getId(), offerPrice, message, paymentMethod, deliveryMethod, deliveryCost

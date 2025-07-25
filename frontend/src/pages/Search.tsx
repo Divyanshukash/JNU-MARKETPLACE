@@ -315,7 +315,7 @@ const Search: React.FC = () => {
                             No Image
                           </div>
                         )}
-                        <div className="font-bold text-primary-700 dark:text-primary-400 text-lg mb-1 truncate">{listing.title}</div>
+                        <div className="font-bold text-primary-700 dark:text-primary-200 text-lg mb-1 truncate">{listing.title}</div>
                         <div className="text-gray-600 dark:text-gray-300 mb-1">Price: ₹{listing.price}</div>
                         <div className="text-gray-500 dark:text-gray-400 text-xs mb-2 truncate">{listing.description}</div>
                         <div className="text-xs text-gray-400 dark:text-gray-500 mb-1">Category: {listing.category}</div>

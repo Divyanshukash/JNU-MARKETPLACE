@@ -63,9 +63,12 @@ public class SaleRequestService {
         SaleRequest saleRequest = new SaleRequest(listingId, buyerId, listing.getSellerId(), offerPrice);
         saleRequest.setOriginalPrice(listing.getPrice());
         saleRequest.setMessage(message);
-        saleRequest.setPaymentMethod(paymentMethod);
-        saleRequest.setDeliveryMethod(deliveryMethod);
-        saleRequest.setDeliveryCost(deliveryCost != null ? deliveryCost : BigDecimal.ZERO);
+        if (!listing.isDonation()) {
+            if (paymentMethod != null) saleRequest.setPaymentMethod(paymentMethod);
+            if (deliveryMethod != null) saleRequest.setDeliveryMethod(deliveryMethod);
+            saleRequest.setDeliveryCost(deliveryCost != null ? deliveryCost : BigDecimal.ZERO);
+        }
+        // For donation, skip payment/delivery fields
         
         return saleRequestRepository.save(saleRequest);
     }

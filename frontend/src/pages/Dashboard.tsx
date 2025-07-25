@@ -901,7 +901,7 @@ const Dashboard: React.FC = () => {
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
                                 <div>
-                                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{listing.title}</h3>
+                                  <h3 className="font-semibold text-gray-900 dark:text-primary-200 mb-1">{listing.title}</h3>
                                   <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">{listing.description}</p>
                                   <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                                     <span className="flex items-center space-x-1">

@@ -63,6 +63,9 @@ const Footer: React.FC = () => {
                   <span>karancs12@gmail.com</span>
                 </div>
               </div>
+              <div className="mt-2 text-sm text-gray-300 dark:text-gray-300 text-center">
+                Developed by Divyanshu Kashyap and Prof Karan Singh
+              </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Phone className="h-4 w-4" />
                 <span>+91 11 2670 4000</span>

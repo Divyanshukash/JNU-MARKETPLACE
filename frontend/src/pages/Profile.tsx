@@ -34,6 +34,8 @@ const Profile: React.FC = () => {
     email: '',
     phone: '',
     bio: '',
+    address: '',
+    qrCodeImage: '',
   });
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,10 @@ const Profile: React.FC = () => {
     messages: 0,
     wishlist: 0
   });
+  const [qrFile, setQrFile] = useState<File | null>(null);
+  const [qrUploading, setQrUploading] = useState(false);
+  const [qrUploadError, setQrUploadError] = useState<string | null>(null);
+  const [qrUploadSuccess, setQrUploadSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -67,6 +73,8 @@ const Profile: React.FC = () => {
           email: res.data.email || '',
           phone: res.data.phoneNumber || '',
           bio: res.data.bio || '',
+          address: res.data.address || '',
+          qrCodeImage: res.data.qrCodeImage || '',
         });
         setProfilePicture(res.data.profilePicture);
         
@@ -125,6 +133,7 @@ const Profile: React.FC = () => {
           lastName: profile.lastName,
           phoneNumber: profile.phone,
           bio: profile.bio,
+          address: profile.address,
         },
         {
           baseURL: 'http://localhost:8080',
@@ -139,6 +148,8 @@ const Profile: React.FC = () => {
         email: res.data.email || '',
         phone: res.data.phoneNumber || '',
         bio: res.data.bio || '',
+        address: res.data.address || '',
+        qrCodeImage: res.data.qrCodeImage || '',
       });
       setSuccess('Profile updated successfully!');
       setEditing(false);
@@ -180,6 +191,45 @@ const Profile: React.FC = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleQrFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setQrFile(e.target.files[0]);
+      setQrUploadError(null);
+      setQrUploadSuccess(null);
+    }
+  };
+
+  const handleQrUpload = async () => {
+    if (!qrFile) return;
+    setQrUploading(true);
+    setQrUploadError(null);
+    setQrUploadSuccess(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', qrFile);
+      const res = await axios.post('/api/users/upload-qr-code', formData, {
+        baseURL: 'http://localhost:8080',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      setProfile((prev) => ({ ...prev, qrCodeImage: res.data }));
+      setQrUploadSuccess('QR code uploaded!');
+      setQrFile(null);
+    } catch (err: any) {
+      setQrUploadError('Failed to upload QR code.');
+    } finally {
+      setQrUploading(false);
+    }
+  };
+
+  const handleQrRemove = () => {
+    setProfile((prev) => ({ ...prev, qrCodeImage: '' }));
+    setQrFile(null);
+    setQrUploadError(null);
+    setQrUploadSuccess(null);
   };
 
   if (loading) return (
@@ -286,6 +336,56 @@ const Profile: React.FC = () => {
                     {uploadSuccess && <div className="text-green-600 text-sm mt-2">{uploadSuccess}</div>}
                   </div>
                 )}
+
+                {/* QR Code Upload Section */}
+                <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">Your QR Code (optional)</div>
+                  {profile.qrCodeImage && !qrFile && (
+                    <div className="mb-2 flex flex-col items-center">
+                      <img
+                        src={`http://localhost:8080${profile.qrCodeImage}`}
+                        alt="QR Code"
+                        className="w-32 h-32 object-contain border border-gray-300 rounded mb-2 bg-white"
+                      />
+                      {editing && (
+                        <button
+                          onClick={handleQrRemove}
+                          className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                        >
+                          Remove QR Code
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {editing && (
+                    <div className="flex flex-col items-center">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleQrFileChange}
+                        className="mb-2"
+                      />
+                      {qrFile && (
+                        <>
+                          <img
+                            src={URL.createObjectURL(qrFile)}
+                            alt="QR Preview"
+                            className="w-32 h-32 object-contain border border-gray-300 rounded mb-2 bg-white"
+                          />
+                          <button
+                            onClick={handleQrUpload}
+                            disabled={qrUploading}
+                            className="px-3 py-1 bg-primary-500 text-white text-xs rounded hover:bg-primary-600 disabled:opacity-50"
+                          >
+                            {qrUploading ? 'Uploading...' : 'Upload QR Code'}
+                          </button>
+                        </>
+                      )}
+                      {qrUploadError && <div className="text-red-600 text-xs mt-2">{qrUploadError}</div>}
+                      {qrUploadSuccess && <div className="text-green-600 text-xs mt-2">{qrUploadSuccess}</div>}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -441,6 +541,25 @@ const Profile: React.FC = () => {
                     }`}
                     readOnly={!editing}
                     placeholder="Tell us about yourself..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                    Address (optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={profile.address}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors ${
+                      editing 
+                        ? 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white' 
+                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                    }`}
+                    readOnly={!editing}
+                    placeholder="Enter your address (optional)"
                   />
                 </div>
 

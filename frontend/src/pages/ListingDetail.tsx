@@ -212,8 +212,6 @@ const ListingDetail: React.FC = () => {
           listingId: listing.id,
           offerPrice: 0,
           message: donationOfferMessage,
-          paymentMethod: 'NONE',
-          deliveryMethod: 'NONE',
           deliveryCost: 0
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -236,7 +234,7 @@ const ListingDetail: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 pt-16">
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold mb-2">{listing.title}</h2>
+        <h2 className="text-2xl font-bold mb-2 text-primary-700 dark:text-primary-200">{listing.title}</h2>
         <div className="text-gray-600 mb-2">Price: ₹{listing.price}</div>
         <div className="text-gray-500 mb-2">{listing.description}</div>
         <div className="text-sm text-gray-400 mb-1">Category: {listing.category}</div>

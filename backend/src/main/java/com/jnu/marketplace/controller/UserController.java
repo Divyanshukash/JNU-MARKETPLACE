@@ -131,4 +131,33 @@ public class UserController {
         userService.saveUser(user);
         return ResponseEntity.ok(user.getProfilePicture());
     }
+
+    @PostMapping(value = "/upload-qr-code", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadQrCode(@RequestParam("file") MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userService.getUserByEmail(email);
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file uploaded");
+        }
+        // Only allow certain file types
+        String contentType = file.getContentType();
+        if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png") || contentType.equals("image/gif") || contentType.equals("image/webp"))) {
+            return ResponseEntity.badRequest().body("Invalid file type");
+        }
+        // Save file to /uploads/qr-codes/
+        String uploadDir = "uploads/qr-codes/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        String originalFilename = file.getOriginalFilename();
+        String ext = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf('.')) : ".png";
+        String filename = UUID.randomUUID() + ext;
+        Path filepath = Paths.get(uploadDir, filename);
+        Files.copy(file.getInputStream(), filepath);
+        // Update user profile
+        user.setQrCodeImage("/uploads/qr-codes/" + filename);
+        userService.saveUser(user);
+        return ResponseEntity.ok(user.getQrCodeImage());
+    }
 } 
