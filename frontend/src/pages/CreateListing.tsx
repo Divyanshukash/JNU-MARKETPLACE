@@ -56,6 +56,8 @@ const CreateListing: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [isDonation, setIsDonation] = useState(false);
+  const [lifeOfItem, setLifeOfItem] = useState('');
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/listings/categories')
@@ -102,6 +104,12 @@ const CreateListing: React.FC = () => {
     setUploadingImages(prev => prev.filter(img => img.url !== url));
   };
 
+  const handleDonationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsDonation(e.target.checked);
+    if (e.target.checked) {
+      setPrice('0');
+    }
+  };
 
 
   const allUploadsDone = uploadingImages.every(img => img.url || img.error);
@@ -145,6 +153,8 @@ const CreateListing: React.FC = () => {
           condition,
           images,
           location,
+          isDonation,
+          lifeOfItem,
         },
         {
           baseURL: 'http://localhost:8080',
@@ -165,6 +175,7 @@ const CreateListing: React.FC = () => {
         setImages([]);
       setUploadingImages([]);
       setCurrentStep(1);
+      setLifeOfItem('');
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to create listing.');
     } finally {
@@ -200,24 +211,47 @@ const CreateListing: React.FC = () => {
                 Be specific and descriptive
               </p>
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Price *
+                Life of the Item (How old is it?)
               </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium text-lg">₹</span>
-                <input 
-                  type="number" 
-                  value={price} 
-                  onChange={e => setPrice(e.target.value)} 
-                  className="w-full pl-10 pr-16 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="0.00"
-                  required 
-                  min="0.01" 
-                  step="0.01" 
-                />
-                <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex flex-col">
+              <input
+                type="text"
+                value={lifeOfItem}
+                onChange={e => setLifeOfItem(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                placeholder="e.g. 2 years, 6 months, brand new, etc."
+              />
+            </div>
+            <div className="flex items-center space-x-3 mt-2">
+              <input
+                id="donation-checkbox"
+                type="checkbox"
+                checked={isDonation}
+                onChange={handleDonationChange}
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              />
+              <label htmlFor="donation-checkbox" className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                This item is for donation (free)
+              </label>
+            </div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              Price *
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium text-lg">₹</span>
+              <input 
+                type="number" 
+                value={price} 
+                onChange={e => setPrice(e.target.value)} 
+                className="w-full pl-10 pr-16 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                placeholder="0.00"
+                required 
+                min="0.00" 
+                step="0.01" 
+                disabled={isDonation}
+              />
+              <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex flex-col">
                   <button
                     type="button"
                     onClick={() => {
@@ -241,7 +275,6 @@ const CreateListing: React.FC = () => {
                     <Minus className="h-3 w-3" />
                   </button>
                 </div>
-              </div>
             </div>
             
             <div>

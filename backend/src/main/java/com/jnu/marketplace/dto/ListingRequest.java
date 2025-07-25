@@ -1,5 +1,6 @@
 package com.jnu.marketplace.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jnu.marketplace.model.Listing;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,11 +21,12 @@ public class ListingRequest {
     private String description;
 
     @NotNull(message = "Price is required")
-    @Positive(message = "Price must be positive")
     private BigDecimal price;
 
     private BigDecimal originalPrice;
     private boolean negotiable = false;
+    @JsonProperty("isDonation")
+    private boolean donation = false;
 
     @NotBlank(message = "Category is required")
     private String category;
@@ -37,6 +39,7 @@ public class ListingRequest {
     private String hostelBlock;
     private String roomNumber;
     private List<String> tags;
+    private String lifeOfItem;
 
     // Constructors
     public ListingRequest() {}
@@ -87,6 +90,14 @@ public class ListingRequest {
 
     public void setNegotiable(boolean negotiable) {
         this.negotiable = negotiable;
+    }
+
+    public boolean getDonation() {
+        return donation;
+    }
+
+    public void setDonation(boolean donation) {
+        this.donation = donation;
     }
 
     public String getCategory() {
@@ -151,6 +162,13 @@ public class ListingRequest {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public String getLifeOfItem() {
+        return lifeOfItem;
+    }
+    public void setLifeOfItem(String lifeOfItem) {
+        this.lifeOfItem = lifeOfItem;
     }
 
     @Override

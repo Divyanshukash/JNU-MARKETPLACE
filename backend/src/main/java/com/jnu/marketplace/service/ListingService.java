@@ -26,6 +26,15 @@ public class ListingService {
     private final UserRepository userRepository;
 
     public Listing createListing(ListingRequest request) {
+        if (request.getDonation()) {
+            if (request.getPrice().compareTo(java.math.BigDecimal.ZERO) != 0) {
+                throw new IllegalArgumentException("Donation listings must have a price of 0.");
+            }
+        } else {
+            if (request.getPrice() == null || request.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Price must be greater than 0 for non-donation listings.");
+            }
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
@@ -42,11 +51,22 @@ public class ListingService {
         listing.setSellerId(user.getId());
         listing.setSellerName(user.getFirstName() + " " + user.getLastName());
         listing.setStatus(ListingStatus.ACTIVE);
+        listing.setDonation(request.getDonation());
+        listing.setLifeOfItem(request.getLifeOfItem());
 
         return listingRepository.save(listing);
     }
 
     public Listing updateListing(String id, ListingRequest request) {
+        if (request.getDonation()) {
+            if (request.getPrice().compareTo(java.math.BigDecimal.ZERO) != 0) {
+                throw new IllegalArgumentException("Donation listings must have a price of 0.");
+            }
+        } else {
+            if (request.getPrice() == null || request.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Price must be greater than 0 for non-donation listings.");
+            }
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
@@ -67,6 +87,8 @@ public class ListingService {
         listing.setPrice(request.getPrice());
         listing.setNegotiable(request.isNegotiable());
         listing.setImages(request.getImages());
+        listing.setDonation(request.getDonation());
+        listing.setLifeOfItem(request.getLifeOfItem());
 
         return listingRepository.save(listing);
     }
@@ -242,5 +264,13 @@ public class ListingService {
 
         listing.decrementFavorites();
         listingRepository.save(listing);
+    }
+
+    public List<Listing> getActiveDonationListings() {
+        return listingRepository.findActiveDonationListings();
+    }
+
+    public Page<Listing> getActiveDonationListings(Pageable pageable) {
+        return listingRepository.findActiveDonationListings(pageable);
     }
 } 

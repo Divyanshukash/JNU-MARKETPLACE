@@ -67,6 +67,12 @@ const Navbar: React.FC<NavbarProps> = ({ theme, setTheme }) => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
+            <Link
+              to="/donations"
+              className="flex items-center space-x-1 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400 transition-colors font-semibold"
+            >
+              <span>Donations</span>
+            </Link>
             {user ? (
               <>
                 <Link
@@ -187,6 +193,13 @@ const Navbar: React.FC<NavbarProps> = ({ theme, setTheme }) => {
 
             {user ? (
               <div className="space-y-2">
+                <Link
+                  to="/donations"
+                  className="flex items-center space-x-2 px-4 py-2 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900 rounded-lg transition-colors font-semibold"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span>Donations</span>
+                </Link>
                 <Link
                   to="/create-listing"
                   className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"

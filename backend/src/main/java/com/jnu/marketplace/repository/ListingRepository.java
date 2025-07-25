@@ -226,4 +226,10 @@ public interface ListingRepository extends MongoRepository<Listing, String> {
     // Best deals (high discount)
     @Query("{'$and': [{'originalPrice': {'$exists': true, '$ne': null}}, {'price': {'$lt': '$originalPrice'}}, {'status': 'ACTIVE'}]}")
     Page<Listing> findDiscountedActiveListings(Pageable pageable);
+
+    @Query("{'isDonation': true, 'status': 'ACTIVE'}")
+    List<Listing> findActiveDonationListings();
+
+    @Query("{'isDonation': true, 'status': 'ACTIVE'}")
+    Page<Listing> findActiveDonationListings(Pageable pageable);
 } 

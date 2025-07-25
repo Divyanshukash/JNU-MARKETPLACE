@@ -38,7 +38,7 @@ public class Listing {
     private String id;
 
     @NotBlank(message = "Title is required")
-    @Size(min = 5, max = 100, message = "Title must be between 5 and 100 characters")
+    @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     @TextIndexed(weight = 3)
     @Field("title")
     private String title;
@@ -143,6 +143,15 @@ public class Listing {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Field("is_donation")
+    private boolean isDonation = false;
+
+    @Field("life_of_item")
+    private String lifeOfItem;
+
+    @Field("reviews")
+    private List<Review> reviews = new ArrayList<>();
+
     // Constructors
     public Listing() {}
 
@@ -225,6 +234,28 @@ public class Listing {
             return ((originalPrice.doubleValue() - price.doubleValue()) / originalPrice.doubleValue()) * 100;
         }
         return 0.0;
+    }
+
+    public boolean isDonation() {
+        return isDonation;
+    }
+
+    public void setDonation(boolean isDonation) {
+        this.isDonation = isDonation;
+    }
+
+    public String getLifeOfItem() {
+        return lifeOfItem;
+    }
+    public void setLifeOfItem(String lifeOfItem) {
+        this.lifeOfItem = lifeOfItem;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 
     // Getters and Setters
@@ -485,7 +516,7 @@ public class Listing {
     }
 
     // Enums
-    public enum Category {
+    public static enum Category {
         BOOKS("Books"),
         ELECTRONICS("Electronics"),
         FURNITURE("Furniture"),
@@ -501,7 +532,8 @@ public class Listing {
         TOYS("Toys & Games"),
         HEALTH("Health & Wellness"),
         EDUCATION("Education & Training"),
-        OTHER("Other");
+        OTHER("Other"),
+        ACCOMMODATION("Accommodation");
 
         private final String displayName;
 
@@ -514,7 +546,7 @@ public class Listing {
         }
     }
 
-    public enum Condition {
+    public static enum Condition {
         NEW("New"),
         LIKE_NEW("Like New"),
         EXCELLENT("Excellent"),
@@ -533,7 +565,7 @@ public class Listing {
         }
     }
 
-    public enum ListingStatus {
+    public static enum ListingStatus {
         DRAFT("Draft"),
         ACTIVE("Active"),
         SOLD("Sold"),
@@ -628,5 +660,32 @@ public class Listing {
         public void setPincode(String pincode) {
             this.pincode = pincode;
         }
+    }
+
+    public static class Review {
+        private String reviewerName;
+        private String reviewerId;
+        private int rating;
+        private String comment;
+        private LocalDateTime createdAt;
+
+        public Review() {}
+        public Review(String reviewerName, String reviewerId, int rating, String comment, LocalDateTime createdAt) {
+            this.reviewerName = reviewerName;
+            this.reviewerId = reviewerId;
+            this.rating = rating;
+            this.comment = comment;
+            this.createdAt = createdAt;
+        }
+        public String getReviewerName() { return reviewerName; }
+        public void setReviewerName(String reviewerName) { this.reviewerName = reviewerName; }
+        public String getReviewerId() { return reviewerId; }
+        public void setReviewerId(String reviewerId) { this.reviewerId = reviewerId; }
+        public int getRating() { return rating; }
+        public void setRating(int rating) { this.rating = rating; }
+        public String getComment() { return comment; }
+        public void setComment(String comment) { this.comment = comment; }
+        public LocalDateTime getCreatedAt() { return createdAt; }
+        public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     }
 } 

@@ -25,6 +25,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import com.jnu.marketplace.repository.ListingRepository;
 
 @RestController
 @RequestMapping("/api/listings")
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public class ListingController {
 
     private final ListingService listingService;
+    private final ListingRepository listingRepository;
 
     @PostMapping
     public ResponseEntity<Listing> createListing(@Valid @RequestBody ListingRequest request) {
@@ -174,5 +177,56 @@ public class ListingController {
                 "New", "Like New", "Good", "Fair", "Poor"
         );
         return ResponseEntity.ok(conditions);
+    }
+
+    @GetMapping("/donations")
+    public ResponseEntity<Page<Listing>> getDonationListings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Listing> donations = listingService.getActiveDonationListings(pageable);
+        return ResponseEntity.ok(donations);
+    }
+
+    @PostMapping("/{id}/reviews")
+    public ResponseEntity<?> addReview(@PathVariable String id, @RequestBody ReviewRequest reviewRequest) {
+        Listing listing = listingService.getListingById(id);
+        if (listing.getCategory() != Listing.Category.ACCOMMODATION) {
+            return ResponseEntity.badRequest().body("Reviews are only allowed for accommodation listings.");
+        }
+        Listing.Review review = new Listing.Review(
+            reviewRequest.getReviewerName(),
+            reviewRequest.getReviewerId(),
+            reviewRequest.getRating(),
+            reviewRequest.getComment(),
+            LocalDateTime.now()
+        );
+        listing.getReviews().add(review);
+        listingRepository.save(listing);
+        return ResponseEntity.ok(listing.getReviews());
+    }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<?> getReviews(@PathVariable String id) {
+        Listing listing = listingService.getListingById(id);
+        return ResponseEntity.ok(listing.getReviews());
+    }
+
+    // DTO for review requests
+    public static class ReviewRequest {
+        private String reviewerName;
+        private String reviewerId;
+        private int rating;
+        private String comment;
+        // getters and setters
+        public String getReviewerName() { return reviewerName; }
+        public void setReviewerName(String reviewerName) { this.reviewerName = reviewerName; }
+        public String getReviewerId() { return reviewerId; }
+        public void setReviewerId(String reviewerId) { this.reviewerId = reviewerId; }
+        public int getRating() { return rating; }
+        public void setRating(int rating) { this.rating = rating; }
+        public String getComment() { return comment; }
+        public void setComment(String comment) { this.comment = comment; }
     }
 } 

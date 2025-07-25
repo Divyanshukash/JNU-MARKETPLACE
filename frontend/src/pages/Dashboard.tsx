@@ -46,6 +46,8 @@ interface Listing {
   description?: string;
   category?: string;
   condition?: string;
+  donation?: boolean;
+  isDonation?: boolean;
 }
 
 const Dashboard: React.FC = () => {
@@ -178,6 +180,10 @@ const Dashboard: React.FC = () => {
 
     setFilteredListings(filtered);
   }, [searchQuery, statusFilter, categoryFilter, priceRange, listings]);
+
+  // Separate donation and regular listings
+  const donationListings = filteredListings.filter(l => l.price === 0 || l.donation === true || l.isDonation === true);
+  const regularListings = filteredListings.filter(l => !(l.price === 0 || l.donation === true || l.isDonation === true));
 
   // Close filter dropdown when clicking outside
   useEffect(() => {
@@ -600,11 +606,54 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="p-6">
+                {/* Show donations first if any */}
+                {donationListings.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-green-700 dark:text-green-300 mb-4">Your Donation Listings</h3>
+                    <div className="space-y-4">
+                      {donationListings.map(listing => (
+                        <div key={listing.id || listing._id} className="border border-green-200 dark:border-green-700 rounded-lg p-4 bg-green-50 dark:bg-green-900/20 flex items-start space-x-4">
+                          {listing.images && listing.images.length > 0 ? (
+                            <img
+                              src={`http://localhost:8080${listing.images[0]}`}
+                              alt={listing.title}
+                              className="w-20 h-20 object-cover rounded-lg"
+                            />
+                          ) : (
+                            <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                              <Package className="h-8 w-8 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="px-2 py-1 bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200 text-xs rounded-full font-semibold">Donation</span>
+                              <h4 className="font-semibold text-gray-900 dark:text-white">{listing.title}</h4>
+                            </div>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">{listing.description}</p>
+                            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                              <span className="flex items-center space-x-1">
+                                <Calendar className="h-4 w-4" />
+                                <span>{formatDate(listing.createdAt)}</span>
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                listing.status === 'SOLD' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                              }`}>
+                                {listing.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {listingsError ? (
                   <div className="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
                     {listingsError}
                   </div>
-                ) : filteredListings.length === 0 ? (
+                ) : regularListings.length === 0 ? (
                   <div className="text-center py-12">
                     {searchQuery ? (
                       <>
@@ -637,7 +686,7 @@ const Dashboard: React.FC = () => {
                     {(searchQuery || statusFilter !== 'all' || categoryFilter !== 'all' || priceRange !== 'all') && (
                       <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <p className="text-sm text-blue-600 dark:text-blue-400">
-                          Showing {filteredListings.length} of {listings.length} listings
+                          Showing {regularListings.length} of {listings.length} listings
                           {searchQuery && ` for "${searchQuery}"`}
                           {(statusFilter !== 'all' || categoryFilter !== 'all' || priceRange !== 'all') && ' with filters applied'}
                         </p>
@@ -662,7 +711,7 @@ const Dashboard: React.FC = () => {
                         )}
                       </div>
                     )}
-                    {filteredListings.map(listing => (
+                    {regularListings.map(listing => (
                       <div key={listing.id || listing._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
                         {editingId === (listing.id || listing._id) ? (
                           <div className="space-y-4">

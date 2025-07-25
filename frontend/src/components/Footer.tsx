@@ -58,7 +58,10 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Mail className="h-4 w-4" />
-                <span>support@jnu-bazaar.com</span>
+                <div className="flex flex-col">
+                  <span>kasdhyapdivyanshu002@gmail.com</span>
+                  <span>karancs12@gmail.com</span>
+                </div>
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Phone className="h-4 w-4" />
@@ -71,9 +74,7 @@ const Footer: React.FC = () => {
         {/* Bottom Section */}
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © 2024 JNU BAZAAR. All rights reserved.
-            </p>
+            
             <div className="flex space-x-6 mt-4 md:mt-0">
               <span className="text-gray-400 text-sm">
                 Made with ❤️ for JNU Community
