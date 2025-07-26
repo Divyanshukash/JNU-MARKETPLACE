@@ -56,15 +56,15 @@ const Footer: React.FC = () => {
                 <MapPin className="h-4 w-4" />
                 <span>JNU Campus, New Delhi</span>
               </div>
-              <div className="flex items-center space-x-2 text-gray-300">
-                <Mail className="h-4 w-4" />
-                <div className="flex flex-col">
-                  <span>kasdhyapdivyanshu002@gmail.com</span>
-                  <span>karancs12@gmail.com</span>
-                </div>
-              </div>
-              <div className="mt-2 text-sm text-gray-300 dark:text-gray-300 text-center">
-                Developed by Divyanshu Kashyap and Prof Karan Singh
+              <div className="flex items-center space-x-2 text-gray-300 text-sm">
+                <span className="invisible"><MapPin className="h-4 w-4" /></span>
+                <Link
+                  to="/developers"
+                  style={{ display: 'inline', color: 'inherit', textDecoration: 'none' }}
+                  className="hover:text-white cursor-pointer"
+                >
+                  Meet the Developers
+                </Link>
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Phone className="h-4 w-4" />

@@ -18,6 +18,7 @@ import Wishlist from './pages/Wishlist';
 import SaleRequests from './pages/SaleRequests';
 import About from './pages/About';
 import Donations from './pages/Donations';
+import Developers from './pages/Developers';
 
 function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
@@ -44,6 +45,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/listings/:id" element={<ListingDetail />} />
             <Route path="/donations" element={<Donations />} />
+            <Route path="/developers" element={<Developers />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
