@@ -95,7 +95,7 @@ const ListingDetail: React.FC = () => {
     }
     try {
       await axios.post(
-        `http://localhost:8080/api/messages`,
+       `${process.env.REACT_APP_API_URL}/messages`,
         {
           recipientId: listing.sellerId,
           listingId: listing.id,
@@ -123,7 +123,7 @@ const ListingDetail: React.FC = () => {
     }
     try {
       await axios.post(
-        `http://localhost:8080/api/users/wishlist/${listing.id}`,
+        `${process.env.REACT_APP_API_URL}/users/wishlist/${listing.id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -163,7 +163,7 @@ const ListingDetail: React.FC = () => {
       const reviewerName = localStorage.getItem('userName') || 'Anonymous';
       const reviewerId = localStorage.getItem('userId') || '';
       await axios.post(
-        `http://localhost:8080/api/listings/${listing.id}/reviews`,
+       `${process.env.REACT_APP_API_URL}/listings/${listing.id}/reviews`,
         {
           reviewerName,
           reviewerId,
@@ -176,7 +176,7 @@ const ListingDetail: React.FC = () => {
       setReviewRating(0);
       setReviewComment('');
       // Refresh reviews
-      const res = await axios.get(`http://localhost:8080/api/listings/${listing.id}/reviews`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/listings/${listing.id}/reviews`);
       setReviews(res.data);
     } catch (err: any) {
       setReviewError(err?.response?.data || 'Failed to submit review.');
@@ -207,7 +207,7 @@ const ListingDetail: React.FC = () => {
     }
     try {
       await axios.post(
-        `http://localhost:8080/api/sale-requests/create`,
+        `${process.env.REACT_APP_API_URL}/sale-requests/create`,
         {
           listingId: listing.id,
           offerPrice: 0,
