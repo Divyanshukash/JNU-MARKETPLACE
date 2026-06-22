@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AuthRequest, AuthResponse, User } from '../types';
 
 // API_BASE_URL is set to http://localhost:8080/api by default for local development
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 // Create axios instance with base configuration
 const api = axios.create({
