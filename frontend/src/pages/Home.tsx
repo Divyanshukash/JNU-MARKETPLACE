@@ -118,17 +118,17 @@ const Home: React.FC = () => {
   }, [imagesLoaded]);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/listings/categories')
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/categories`)
       .then(res => setCategories(res.data))
       .catch(() => setCategories([]));
-    axios.get('http://localhost:8080/api/listings/conditions')
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/conditions`)
       .then(res => setConditions(res.data))
       .catch(() => setConditions([]));
     fetchListings();
   }, []);
 
   const fetchListings = (filterParams = filters) => {
-    axios.post('http://localhost:8080/api/listings/search', {
+    axios.post(`${process.env.REACT_APP_API_URL}/listings/search`, {
       category: filterParams.category ? filterParams.category.toUpperCase() : undefined,
       minPrice: filterParams.minPrice ? parseFloat(filterParams.minPrice) : undefined,
       maxPrice: filterParams.maxPrice ? parseFloat(filterParams.maxPrice) : undefined,
