@@ -209,7 +209,7 @@ const Dashboard: React.FC = () => {
     setDeleteSuccess(null);
     try {
       await axios.delete(`/api/listings/${id}`, {
-        baseURL: 'http://localhost:8080',
+        baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -276,7 +276,7 @@ const Dashboard: React.FC = () => {
           negotiable: false,
         },
         {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -309,7 +309,7 @@ const Dashboard: React.FC = () => {
     formData.append('file', file);
     try {
       const res = await axios.post('/api/listings/upload', formData, {
-        baseURL: 'http://localhost:8080',
+        baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
