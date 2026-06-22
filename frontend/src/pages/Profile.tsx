@@ -94,15 +94,15 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem('accessToken');
       const [listingsRes, messagesRes, wishlistRes] = await Promise.all([
         axios.get('/api/listings/my-listings', {
-          baseURL: 'http://localhost:8080',
+          baseURL:process.env.REACT_APP_BASE_URL,
           headers: { Authorization: `Bearer ${token}` },
         }),
         axios.get('/api/messages/conversations', {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_BASE_URL,
           headers: { Authorization: `Bearer ${token}` },
         }),
         axios.get('/api/users/wishlist', {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_BASE_URL,
           headers: { Authorization: `Bearer ${token}` },
         })
       ]);
@@ -136,7 +136,7 @@ const Profile: React.FC = () => {
           address: profile.address,
         },
         {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_BASE_URL,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -178,7 +178,7 @@ const Profile: React.FC = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
       const res = await axios.post('/api/users/upload-profile-picture', formData, {
-        baseURL: 'http://localhost:8080',
+        baseURL: process.env.REACT_APP_BASE_URL,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -210,7 +210,7 @@ const Profile: React.FC = () => {
       const formData = new FormData();
       formData.append('file', qrFile);
       const res = await axios.post('/api/users/upload-qr-code', formData, {
-        baseURL: 'http://localhost:8080',
+        baseURL: process.env.REACT_APP_BASE_URL,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
