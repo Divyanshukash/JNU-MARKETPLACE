@@ -10,7 +10,7 @@ const Donations: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('http://localhost:8080/api/listings/donations?page=0&size=20')
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/donations?page=0&size=20')
       .then(res => {
         setDonations(res.data.content || []);
         setLoading(false);
@@ -31,7 +31,7 @@ const Donations: React.FC = () => {
           {donations.map(listing => (
             <div key={listing.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition">
               {listing.images && listing.images.length > 0 && (
-                <img src={`http://localhost:8080${listing.images[0]}`} alt={listing.title} className="w-full h-40 object-cover rounded mb-3" />
+                <img src={`${process.env.REACT_APP_BASE_URL}${listing.images[0]}`} alt={listing.title} className="w-full h-40 object-cover rounded mb-3" />
               )}
               <div className="flex items-center mb-2">
                 <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">Free/Donation</span>
