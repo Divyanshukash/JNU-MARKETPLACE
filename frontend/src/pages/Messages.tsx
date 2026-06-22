@@ -23,7 +23,7 @@ import {
 
 // Create authenticated axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -421,7 +421,7 @@ const Messages: React.FC = () => {
                           <div className="relative">
                             {conv.otherUserProfilePicture ? (
                               <img 
-                                src={`http://localhost:8080${conv.otherUserProfilePicture}`} 
+                                src={`${process.env.REACT_APP_BASE_URL}${conv.otherUserProfilePicture}`}
                                 alt={conv.otherUserName}
                                 className="w-12 h-12 rounded-full object-cover"
                               />
@@ -473,7 +473,7 @@ const Messages: React.FC = () => {
                           <div className="relative">
                             {selectedConv.otherUserProfilePicture ? (
                               <img 
-                                src={`http://localhost:8080${selectedConv.otherUserProfilePicture}`} 
+                                src={`${process.env.REACT_APP_BASE_URL}${selectedConv.otherUserProfilePicture}`}
                                 alt={selectedConv.otherUserName}
                                 className="w-10 h-10 rounded-full object-cover"
                               />
@@ -546,7 +546,7 @@ const Messages: React.FC = () => {
                                        <div className="mt-2">
                                          {msg.attachmentUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                            <img 
-                                             src={`http://localhost:8080${msg.attachmentUrl}`} 
+                                             src={`${process.env.REACT_APP_BASE_URL}${msg.attachmentUrl}`}
                                              alt="Attachment" 
                                              className="max-w-xs rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                                              onClick={() => window.open(`http://localhost:8080${msg.attachmentUrl}`, '_blank')}
