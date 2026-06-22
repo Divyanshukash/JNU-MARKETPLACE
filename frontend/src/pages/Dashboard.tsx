@@ -440,7 +440,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   {user?.profilePicture ? (
                     <img 
-                      src={`http://localhost:8080${user.profilePicture}`} 
+                      src={`${process.env.REACT_APP_BASE_URL}${user.profilePicture}`} 
                       alt="Profile" 
                       className="w-16 h-16 rounded-full object-cover border-2 border-white/20" 
                     />
@@ -615,7 +615,7 @@ const Dashboard: React.FC = () => {
                         <div key={listing.id || listing._id} className="border border-green-200 dark:border-green-700 rounded-lg p-4 bg-green-50 dark:bg-green-900/20 flex items-start space-x-4">
                           {listing.images && listing.images.length > 0 ? (
                             <img
-                              src={`http://localhost:8080${listing.images[0]}`}
+                              src={`${process.env.REACT_APP_BASE_URL}${listing.images[0]}`}
                               alt={listing.title}
                               className="w-20 h-20 object-cover rounded-lg"
                             />
@@ -797,7 +797,7 @@ const Dashboard: React.FC = () => {
                                   {editForm.images.map((imgUrl, idx) => (
                                     <div key={idx} className="relative">
                                       <img 
-                                        src={`http://localhost:8080${imgUrl}`} 
+                                        src={`${process.env.REACT_APP_BASE_URL}${imgUrl}`} 
                                         alt={`Listing ${idx + 1}`} 
                                         className="w-full h-20 object-cover rounded-lg" 
                                       />
@@ -826,7 +826,7 @@ const Dashboard: React.FC = () => {
                                         {img.url ? (
                                           <div className="relative">
                                             <img 
-                                              src={`http://localhost:8080${img.url}`} 
+                                              src={`${process.env.REACT_APP_BASE_URL}${img.url}`} 
                                               alt="Uploading" 
                                               className="w-full h-20 object-cover rounded-lg" 
                                             />
@@ -888,7 +888,7 @@ const Dashboard: React.FC = () => {
                           <div className="flex items-start space-x-4">
                             {listing.images && listing.images.length > 0 ? (
                               <img
-                                src={`http://localhost:8080${listing.images[0]}`}
+                                src={`${process.env.REACT_APP_BASE_URL}${listing.images[0]}`}
                                 alt={listing.title}
                                 className="w-20 h-20 object-cover rounded-lg"
                               />
