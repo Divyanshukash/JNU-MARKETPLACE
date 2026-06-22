@@ -46,7 +46,7 @@ const SaleRequests: React.FC = () => {
   const fetchUserInfo = async (userId: string): Promise<UserInfo | null> => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
