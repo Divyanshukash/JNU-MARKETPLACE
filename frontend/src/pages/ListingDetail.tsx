@@ -34,11 +34,11 @@ const ListingDetail: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    axios.get(`http://localhost:8080/api/listings/${id}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/${id}`)
       .then(res => setListing(res.data))
       .catch(() => setListing(null));
     // Fetch reviews
-    axios.get(`http://localhost:8080/api/listings/${id}/reviews`)
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/${id}/reviews`)
       .then(res => setReviews(res.data))
       .catch(() => setReviews([]));
   }, [id]);
@@ -259,7 +259,7 @@ const ListingDetail: React.FC = () => {
             {listing.images.map((imgUrl: string, idx: number) => (
               <img
                 key={idx}
-                src={`http://localhost:8080${imgUrl}`}
+                src={`${process.env.REACT_APP_BASE_URL}${imgUrl}`}
                 alt={listing.title}
                 className="w-40 h-40 object-cover rounded"
               />
