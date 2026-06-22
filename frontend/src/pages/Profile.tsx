@@ -62,7 +62,7 @@ const Profile: React.FC = () => {
       setError(null);
       try {
         const res = await axios.get('/api/users/profile', {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_BASE_URL,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -264,7 +264,7 @@ const Profile: React.FC = () => {
                   <div className="relative inline-block">
                     {profilePicture ? (
                       <img
-                        src={`http://localhost:8080${profilePicture}`}
+                        src={`${process.env.REACT_APP_BASE_URL}${profilePicture}`}
                         alt="Profile"
                         className="w-24 h-24 rounded-full object-cover border-4 border-white/20"
                       />
@@ -343,7 +343,7 @@ const Profile: React.FC = () => {
                   {profile.qrCodeImage && !qrFile && (
                     <div className="mb-2 flex flex-col items-center">
                       <img
-                        src={`http://localhost:8080${profile.qrCodeImage}`}
+                        src={`${process.env.REACT_APP_BASE_URL}${profile.qrCodeImage}`}
                         alt="QR Code"
                         className="w-32 h-32 object-contain border border-gray-300 rounded mb-2 bg-white"
                       />
