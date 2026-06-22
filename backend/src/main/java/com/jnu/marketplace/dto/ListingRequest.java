@@ -29,7 +29,7 @@ public class ListingRequest {
     private boolean donation = false;
 
     @NotBlank(message = "Category is required")
-    private String category;
+    private Listing.Category category;
 
     private String subCategory;
     private Listing.Condition condition;
