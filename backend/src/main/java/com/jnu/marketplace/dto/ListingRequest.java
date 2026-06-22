@@ -13,11 +13,11 @@ import java.util.List;
 public class ListingRequest {
 
     @NotBlank(message = "Title is required")
-    @Size(min = 3, max = 100, message = "Title must be between 5 and 100 characters")
+    @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     private String title;
 
     @NotBlank(message = "Description is required")
-    @Size(min = 5, max = 2000, message = "Description must be between 10 and 2000 characters")
+    @Size(min = 5, max = 2000, message = "Description must be between 5 and 2000 characters")
     private String description;
 
     @NotNull(message = "Price is required")
@@ -28,7 +28,7 @@ public class ListingRequest {
     @JsonProperty("isDonation")
     private boolean donation = false;
 
-    @NotBlank(message = "Category is required")
+    @NotNull(message = "Category is required")
     private Listing.Category category;
 
     private String subCategory;
@@ -44,7 +44,7 @@ public class ListingRequest {
     // Constructors
     public ListingRequest() {}
 
-    public ListingRequest(String title, String description, BigDecimal price, String category) {
+    public ListingRequest(String title, String description, BigDecimal price, Listing.Category category) {
         this.title = title;
         this.description = description;
         this.price = price;
@@ -100,12 +100,12 @@ public class ListingRequest {
         this.donation = donation;
     }
 
-    public String getCategory() {
-        return category;
+    public Listing.Category getCategory() {
+    return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategory(Listing.Category category) {
+    this.category = category;
     }
 
     public String getSubCategory() {
