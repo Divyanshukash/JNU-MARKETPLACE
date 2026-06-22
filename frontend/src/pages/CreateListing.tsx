@@ -399,7 +399,7 @@ const CreateListing: React.FC = () => {
                       {img.url ? (
                         <div className="relative">
                           <img 
-                            src={`${process.env.REACT_APP_BASE_URL}${img.url}`} 
+                            src={`${process.env.REACT_APP_API_URL?.replace('/api', '')}${img.url}`}
                             alt="Listing" 
                             className="w-full h-24 object-cover rounded-lg" 
                           />
