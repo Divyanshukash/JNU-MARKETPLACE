@@ -49,7 +49,7 @@ class SaleRequestService {
   // Create a new sale request/offer
   async createSaleRequest(data: CreateSaleRequestData): Promise<SaleRequest> {
     const response = await axios.post(
-      `${API_BASE_URL}/api/sale-requests/create`,
+      `${API_BASE_URL}/sale-requests/create`,
       data,
       { headers: this.getAuthHeaders() }
     );
@@ -59,7 +59,7 @@ class SaleRequestService {
   // Accept a sale request (seller action)
   async acceptSaleRequest(requestId: string, sellerResponse: string): Promise<any> {
     const response = await axios.post(
-      `${API_BASE_URL}/api/sale-requests/${requestId}/accept`,
+      `${API_BASE_URL}/sale-requests/${requestId}/accept`,
       { sellerResponse },
       { headers: this.getAuthHeaders() }
     );
@@ -69,7 +69,7 @@ class SaleRequestService {
   // Reject a sale request (seller action)
   async rejectSaleRequest(requestId: string, sellerResponse: string): Promise<SaleRequest> {
     const response = await axios.post(
-      `${API_BASE_URL}/api/sale-requests/${requestId}/reject`,
+      `${API_BASE_URL}/sale-requests/${requestId}/reject`,
       { sellerResponse },
       { headers: this.getAuthHeaders() }
     );
@@ -79,7 +79,7 @@ class SaleRequestService {
   // Cancel a sale request (buyer action)
   async cancelSaleRequest(requestId: string): Promise<SaleRequest> {
     const response = await axios.post(
-      `${API_BASE_URL}/api/sale-requests/${requestId}/cancel`,
+      `${API_BASE_URL}/sale-requests/${requestId}/cancel`,
       {},
       { headers: this.getAuthHeaders() }
     );
@@ -89,7 +89,7 @@ class SaleRequestService {
   // Get pending requests for seller
   async getPendingRequestsForSeller(): Promise<SaleRequest[]> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/seller/pending`,
+      `${API_BASE_URL}/sale-requests/seller/pending`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -98,7 +98,7 @@ class SaleRequestService {
   // Get pending requests for buyer
   async getPendingRequestsForBuyer(): Promise<SaleRequest[]> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/buyer/pending`,
+      `${API_BASE_URL}/sale-requests/buyer/pending`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -107,7 +107,7 @@ class SaleRequestService {
   // Get user's request history
   async getUserRequestHistory(): Promise<SaleRequest[]> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/history`,
+      `${API_BASE_URL}/sale-requests/history`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -116,7 +116,7 @@ class SaleRequestService {
   // Get sale request by ID
   async getSaleRequestById(requestId: string): Promise<SaleRequest> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/${requestId}`,
+      `${API_BASE_URL}/sale-requests/${requestId}`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -125,7 +125,7 @@ class SaleRequestService {
   // Get requests for a specific listing
   async getRequestsForListing(listingId: string): Promise<SaleRequest[]> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/listing/${listingId}`,
+      `${API_BASE_URL}/sale-requests/listing/${listingId}`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -134,7 +134,7 @@ class SaleRequestService {
   // Check if user has a pending request for a listing
   async checkPendingRequest(listingId: string): Promise<{ hasPendingRequest: boolean }> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/check-pending/${listingId}`,
+      `${API_BASE_URL}/sale-requests/check-pending/${listingId}`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -143,7 +143,7 @@ class SaleRequestService {
   // Get buyer request statistics
   async getBuyerRequestStats(): Promise<any> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/stats/buyer`,
+      `${API_BASE_URL}/sale-requests/stats/buyer`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -152,7 +152,7 @@ class SaleRequestService {
   // Get seller request statistics
   async getSellerRequestStats(): Promise<any> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/stats/seller`,
+      `${API_BASE_URL}/sale-requests/stats/seller`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
@@ -161,7 +161,7 @@ class SaleRequestService {
   // Get request status options
   async getRequestStatusOptions(): Promise<string[]> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/sale-requests/status-options`,
+      `${API_BASE_URL}/sale-requests/status-options`,
       { headers: this.getAuthHeaders() }
     );
     return response.data;
