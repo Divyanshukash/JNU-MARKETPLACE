@@ -96,7 +96,7 @@ const Wishlist: React.FC = () => {
   const removeFromWishlist = async (listingId: string) => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.delete(`http://localhost:8080/api/users/wishlist/${listingId}`, {
+      await axios.delete(`http://jnu-marketplace-final.onrender.com/api/users/wishlist/${listingId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWishlist(prev => prev.filter(item => item.id !== listingId));
