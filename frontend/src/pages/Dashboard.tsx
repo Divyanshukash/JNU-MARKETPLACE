@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
       try {
         // Fetch recent listings for the current user
         const res = await axios.get('/api/listings/my-listings', {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -110,7 +110,7 @@ const Dashboard: React.FC = () => {
       try {
         // Fetch messages count
         const messagesRes = await axios.get('/api/messages/conversations', {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -129,7 +129,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/listings/categories')
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/categories`)
       .then(res => setCategories(res.data))
       .catch(() => setCategories([]));
   }, []);
