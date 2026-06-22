@@ -10,7 +10,7 @@ const Donations: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_API_URL}/listings/donations?page=0&size=20')
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/donations?page=0&size=20`)
       .then(res => {
         setDonations(res.data.content || []);
         setLoading(false);
