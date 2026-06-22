@@ -549,11 +549,11 @@ const Messages: React.FC = () => {
                                              src={`${process.env.REACT_APP_BASE_URL}${msg.attachmentUrl}`}
                                              alt="Attachment" 
                                              className="max-w-xs rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                                             onClick={() => window.open(`http://localhost:8080${msg.attachmentUrl}`, '_blank')}
+                                             onClick={() => window.open(`${process.env.REACT_APP_API_URL?.replace('/api', '')}{msg.attachmentUrl}`, '_blank')}
                                            />
                                          ) : (
                                            <a 
-                                             href={`http://localhost:8080${msg.attachmentUrl}`}
+                                             href={`${process.env.REACT_APP_API_URL?.replace('/api', '')}${msg.attachmentUrl}`}
                                              target="_blank"
                                              rel="noopener noreferrer"
                                              className="inline-flex items-center space-x-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
