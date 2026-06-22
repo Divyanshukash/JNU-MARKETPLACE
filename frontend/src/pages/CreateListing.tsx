@@ -157,7 +157,7 @@ const CreateListing: React.FC = () => {
           lifeOfItem,
         },
         {
-          baseURL: 'http://localhost:8080',
+          baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -473,7 +473,7 @@ const CreateListing: React.FC = () => {
                 <div>
                   {images.length > 0 && (
                     <img 
-                      src={`http://localhost:8080${images[0]}`} 
+                      src={`${process.env.REACT_APP_API_URL?.replace('/api', '')}${images[0]}`} 
                       alt="Main image" 
                       className="w-full h-48 object-cover rounded-lg" 
                     />
