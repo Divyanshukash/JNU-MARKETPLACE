@@ -60,7 +60,7 @@ const CreateListing: React.FC = () => {
   const [lifeOfItem, setLifeOfItem] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/listings/categories')
+    axios.get(`${process.env.REACT_APP_API_URL}/listings/categories`)
       .then(res => {
         setCategories(res.data);
         if (res.data.length > 0) setCategory(res.data[0]);
@@ -82,7 +82,7 @@ const CreateListing: React.FC = () => {
     formData.append('file', file);
     try {
       const res = await axios.post('/api/listings/upload', formData, {
-        baseURL: 'http://localhost:8080',
+        baseURL: process.env.REACT_APP_API_URL?.replace('/api', ''),
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -399,7 +399,7 @@ const CreateListing: React.FC = () => {
                       {img.url ? (
                         <div className="relative">
                           <img 
-                            src={`http://localhost:8080${img.url}`} 
+                            src={`${process.env.REACT_APP_BASE_URL}${img.url}`} 
                             alt="Listing" 
                             className="w-full h-24 object-cover rounded-lg" 
                           />
