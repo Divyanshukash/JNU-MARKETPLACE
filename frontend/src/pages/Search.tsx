@@ -7,7 +7,7 @@ import { saleService } from '../services/saleService';
 
 // Create authenticated axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -306,7 +306,7 @@ const Search: React.FC = () => {
                         
                         {listing.images && listing.images.length > 0 ? (
                           <img
-                            src={`http://localhost:8080${listing.images[0]}`}
+                            src={`${process.env.REACT_APP_BASE_URL}${listing.images[0]}`}
                             alt={listing.title}
                             className="w-full h-48 object-cover rounded mb-2"
                           />
