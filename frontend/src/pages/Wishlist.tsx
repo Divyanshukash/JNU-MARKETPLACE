@@ -59,7 +59,7 @@ const Wishlist: React.FC = () => {
       setLoading(false);
       return;
     }
-    axios.get('http://localhost:8080/api/users/wishlist', {
+    axios.get(`${process.env.REACT_APP_API_URL}/users/wishlist`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async res => {
@@ -72,7 +72,7 @@ const Wishlist: React.FC = () => {
         // Fetch all listings in parallel
         const listings = await Promise.all(
           ids.map(id =>
-            axios.get(`http://localhost:8080/api/listings/${id}`)
+            axios.get(`${process.env.REACT_APP_API_URL}/listings/${id}`)
               .then(r => r.data)
               .catch(() => null)
           )
@@ -374,7 +374,7 @@ const Wishlist: React.FC = () => {
                 <div className="relative">
                   {item.images && item.images.length > 0 ? (
                     <img
-                      src={`http://localhost:8080${item.images[0]}`}
+                      src={`${process.env.REACT_APP_BASE_URL}${item.images[0]}`}
                       alt={item.title}
                       className="w-full h-48 object-cover"
                     />
