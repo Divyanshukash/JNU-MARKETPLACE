@@ -77,6 +77,22 @@ public class UserService implements UserDetailsService {
         return AuthResponse.success(jwtToken, refreshToken, new AuthResponse.UserDto(user));
     }
 
+    public AuthResponse refreshToken(String refreshToken) {
+        String email = jwtService.extractUsername(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (!jwtService.isTokenValid(refreshToken, user)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        return AuthResponse.success(
+                jwtService.generateToken(user),
+                refreshToken,
+                new AuthResponse.UserDto(user)
+        );
+    }
+
     public User updateProfile(String email, User userDetails) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -136,4 +152,4 @@ public class UserService implements UserDetailsService {
     public User saveUser(User user) {
         return userRepository.save(user);
     }
-} 
+}

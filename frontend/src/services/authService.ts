@@ -42,10 +42,10 @@ api.interceptors.response.use(
             refreshToken,
           });
           
-          const { accessToken } = response.data;
-          localStorage.setItem('accessToken', accessToken);
+          const { token } = response.data;
+          localStorage.setItem('accessToken', token);
           
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${token}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
@@ -104,4 +104,8 @@ export const authService = {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
   },
+
 }; 
+
+
+

@@ -2,6 +2,7 @@ package com.jnu.marketplace.controller;
 
 import com.jnu.marketplace.dto.AuthRequest;
 import com.jnu.marketplace.dto.AuthResponse;
+import com.jnu.marketplace.dto.RefreshTokenRequest;
 import com.jnu.marketplace.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(userService.refreshToken(request.getRefreshToken()));
+    }
+
 
 
     @PostMapping("/forgot-password")
@@ -52,4 +58,4 @@ public class AuthController {
         userService.changePassword(email, oldPassword, newPassword);
         return ResponseEntity.ok("Password changed successfully");
     }
-} 
+}

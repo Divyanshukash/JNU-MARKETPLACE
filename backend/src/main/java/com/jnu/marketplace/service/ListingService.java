@@ -9,13 +9,24 @@ import com.jnu.marketplace.repository.ListingRepository;
 import com.jnu.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -24,6 +35,7 @@ public class ListingService {
 
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
+    private final MongoTemplate mongoTemplate;
 
     public Listing createListing(ListingRequest request) {
         if (request.getDonation()) {
@@ -41,19 +53,10 @@ public class ListingService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Listing listing = new Listing();
-        listing.setTitle(request.getTitle());
-        listing.setDescription(request.getDescription());
-        listing.setCategory(Listing.Category.valueOf(request.getCategory().toUpperCase()));
-        listing.setCondition(request.getCondition());
-        listing.setPrice(request.getPrice());
-        listing.setNegotiable(request.isNegotiable());
-        listing.setImages(request.getImages());
+        applyListingRequest(listing, request, false);
         listing.setSellerId(user.getId());
         listing.setSellerName(user.getFirstName() + " " + user.getLastName());
         listing.setStatus(ListingStatus.ACTIVE);
-        listing.setDonation(request.getDonation());
-        listing.setLifeOfItem(request.getLifeOfItem());
-
         return listingRepository.save(listing);
     }
 
@@ -80,15 +83,7 @@ public class ListingService {
             throw new RuntimeException("You can only update your own listings");
         }
 
-        listing.setTitle(request.getTitle());
-        listing.setDescription(request.getDescription());
-        listing.setCategory(Listing.Category.valueOf(request.getCategory().toUpperCase()));
-        listing.setCondition(request.getCondition());
-        listing.setPrice(request.getPrice());
-        listing.setNegotiable(request.isNegotiable());
-        listing.setImages(request.getImages());
-        listing.setDonation(request.getDonation());
-        listing.setLifeOfItem(request.getLifeOfItem());
+        applyListingRequest(listing, request, true);
 
         return listingRepository.save(listing);
     }
@@ -124,78 +119,102 @@ public class ListingService {
     }
 
     public Page<Listing> searchListings(SearchRequest request, Pageable pageable) {
-        // If any filter is set, build a dynamic query
-        boolean hasCategory = request.getCategory() != null && !request.getCategory().isEmpty();
-        boolean hasCondition = request.getCondition() != null;
-        boolean hasMinPrice = request.getMinPrice() != null;
-        boolean hasMaxPrice = request.getMaxPrice() != null;
-        boolean hasKeyword = request.getKeyword() != null && !request.getKeyword().trim().isEmpty();
+        Query query = new Query(Criteria.where("status").is(ListingStatus.ACTIVE));
 
-        // Handle keyword search first
-        if (hasKeyword) {
-            return listingRepository.searchActiveListingsByText(request.getKeyword(), pageable);
+        if (request.hasKeyword()) {
+            String keyword = Pattern.quote(request.getKeyword().trim());
+            query.addCriteria(new Criteria().orOperator(
+                    Criteria.where("title").regex(keyword, "i"),
+                    Criteria.where("description").regex(keyword, "i"),
+                    Criteria.where("tags").regex(keyword, "i"),
+                    Criteria.where("subcategory").regex(keyword, "i"),
+                    Criteria.where("pickupLocation").regex(keyword, "i")
+            ));
         }
-
-        // If no filters, return all active listings
-        if (!hasCategory && !hasCondition && !hasMinPrice && !hasMaxPrice) {
-            return listingRepository.findByStatus(ListingStatus.ACTIVE, pageable);
+        if (hasText(request.getCategory())) query.addCriteria(Criteria.where("category").is(parseCategory(request.getCategory())));
+        if (hasText(request.getSubCategory())) query.addCriteria(Criteria.where("subcategory").is(request.getSubCategory()));
+        if (request.getCondition() != null) query.addCriteria(Criteria.where("condition").is(request.getCondition()));
+        if (request.getMinPrice() != null || request.getMaxPrice() != null) {
+            Criteria price = Criteria.where("price");
+            if (request.getMinPrice() != null) price = price.gte(request.getMinPrice());
+            if (request.getMaxPrice() != null) price = price.lte(request.getMaxPrice());
+            query.addCriteria(price);
         }
+        if (hasText(request.getLocation())) query.addCriteria(Criteria.where("pickupLocation").regex(Pattern.quote(request.getLocation().trim()), "i"));
+        if (hasText(request.getHostelBlock())) query.addCriteria(Criteria.where("pickupLocation").regex(Pattern.quote(request.getHostelBlock().trim()), "i"));
+        if (request.isNegotiable()) query.addCriteria(Criteria.where("negotiable").is(true));
+        if (request.isFeatured()) query.addCriteria(Criteria.where("isFeatured").is(true));
+        if (request.getTags() != null && !request.getTags().isEmpty()) query.addCriteria(Criteria.where("tags").in(request.getTags()));
+        if (hasText(request.getSellerId())) query.addCriteria(Criteria.where("sellerId").is(request.getSellerId()));
 
-        // Get all active listings and filter in memory for simplicity
-        List<Listing> allActive = listingRepository.findByStatus(ListingStatus.ACTIVE, Pageable.unpaged()).getContent();
-        List<Listing> filtered = allActive.stream()
-            .filter(listing -> {
-                // Category filter
-                if (hasCategory) {
-                    try {
-                        Listing.Category category = Listing.Category.valueOf(request.getCategory());
-                        if (listing.getCategory() != category) {
-                            return false;
-                        }
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid category: " + request.getCategory());
-                        return false; // Invalid category
-                    }
-                }
-                
-                // Condition filter
-                if (hasCondition) {
-                    try {
-                        Listing.Condition condition = Listing.Condition.valueOf(request.getCondition().toString());
-                        if (listing.getCondition() != condition) {
-                            return false;
-                        }
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid condition: " + request.getCondition());
-                        return false; // Invalid condition
-                    }
-                }
-                
-                // Price filters
-                if (hasMinPrice && listing.getPrice().compareTo(request.getMinPrice()) < 0) {
-                    return false;
-                }
-                
-                if (hasMaxPrice && listing.getPrice().compareTo(request.getMaxPrice()) > 0) {
-                    return false;
-                }
-                
-                return true;
-            })
-            .toList();
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), resolveSort(request));
+        long total = mongoTemplate.count(query, Listing.class);
+        List<Listing> listings = mongoTemplate.find(query.with(sortedPageable), Listing.class);
+        return new PageImpl<>(listings, sortedPageable, total);
+    }
 
-        System.out.println("Filtered listings count: " + filtered.size());
+    private void applyListingRequest(Listing listing, ListingRequest request, boolean preserveMissingOptionalValues) {
+        listing.setTitle(request.getTitle());
+        listing.setDescription(request.getDescription());
+        listing.setCategory(parseCategory(request.getCategory()));
+        listing.setCondition(request.getCondition());
+        listing.setPrice(request.getPrice());
+        listing.setNegotiable(request.isNegotiable());
+        listing.setImages(request.getImages());
+        listing.setDonation(request.getDonation());
+        listing.setLifeOfItem(request.getLifeOfItem());
 
-        // Apply pagination manually
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), filtered.size());
-        
-        if (start >= filtered.size()) {
-            return new org.springframework.data.domain.PageImpl<>(List.of(), pageable, 0);
+        if (!preserveMissingOptionalValues || request.getSubCategory() != null) {
+            listing.setSubcategory(request.getSubCategory());
         }
-        
-        List<Listing> pageContent = filtered.subList(start, end);
-        return new org.springframework.data.domain.PageImpl<>(pageContent, pageable, filtered.size());
+        if (!preserveMissingOptionalValues || request.getOriginalPrice() != null) {
+            listing.setOriginalPrice(request.getOriginalPrice());
+        }
+        if (!preserveMissingOptionalValues || request.getTags() != null) {
+            listing.setTags(normalizeTags(request.getTags()));
+        }
+        if (!preserveMissingOptionalValues || hasLocationFields(request)) {
+            listing.setPickupLocation(buildPickupLocation(request));
+        }
+    }
+
+    private Listing.Category parseCategory(String category) {
+        if (!hasText(category)) throw new IllegalArgumentException("Category is required");
+        return java.util.Arrays.stream(Listing.Category.values())
+                .filter(value -> value.name().equalsIgnoreCase(category.trim())
+                        || value.getDisplayName().equalsIgnoreCase(category.trim()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category: " + category));
+    }
+
+    private Sort resolveSort(SearchRequest request) {
+        request.normalizeSorting();
+        Sort.Direction direction = "asc".equalsIgnoreCase(request.getSortOrder()) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        return Sort.by(direction, request.getSortBy());
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private Set<String> normalizeTags(List<String> tags) {
+        if (tags == null) return new HashSet<>();
+        return tags.stream()
+                .filter(this::hasText)
+                .map(tag -> tag.trim().toLowerCase(Locale.ROOT))
+                .collect(java.util.stream.Collectors.toCollection(HashSet::new));
+    }
+
+    private String buildPickupLocation(ListingRequest request) {
+        List<String> parts = new ArrayList<>();
+        if (hasText(request.getLocation())) parts.add(request.getLocation().trim());
+        if (hasText(request.getHostelBlock())) parts.add("Hostel: " + request.getHostelBlock().trim());
+        if (hasText(request.getRoomNumber())) parts.add("Room: " + request.getRoomNumber().trim());
+        return parts.isEmpty() ? null : String.join(" | ", parts);
+    }
+
+    private boolean hasLocationFields(ListingRequest request) {
+        return request.getLocation() != null || request.getHostelBlock() != null || request.getRoomNumber() != null;
     }
 
     public List<Listing> getListingsByCategory(String category) {
@@ -273,4 +292,4 @@ public class ListingService {
     public Page<Listing> getActiveDonationListings(Pageable pageable) {
         return listingRepository.findActiveDonationListings(pageable);
     }
-} 
+}

@@ -17,7 +17,7 @@ const Navbar: React.FC<NavbarProps> = ({ theme, setTheme }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -283,4 +283,4 @@ const Navbar: React.FC<NavbarProps> = ({ theme, setTheme }) => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

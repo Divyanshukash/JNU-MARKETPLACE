@@ -185,8 +185,8 @@ public class SearchRequest {
     }
 
     public boolean isValidSortBy() {
-        return sortBy != null && (sortBy.equals("createdAt") || sortBy.equals("price") || 
-                sortBy.equals("viewsCount") || sortBy.equals("favoritesCount") || 
+        return sortBy != null && (sortBy.equals("createdAt") || sortBy.equals("price") ||
+                sortBy.equals("views") || sortBy.equals("favorites") || 
                 sortBy.equals("title") || sortBy.equals("updatedAt"));
     }
 
@@ -224,4 +224,4 @@ public class SearchRequest {
                 ", size=" + size +
                 '}';
     }
-} 
+}

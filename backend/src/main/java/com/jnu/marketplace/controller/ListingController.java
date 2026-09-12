@@ -81,14 +81,8 @@ public class ListingController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        System.out.println("Search request received: " + request);
-        System.out.println("Page: " + page + ", Size: " + size);
-        
         Pageable pageable = PageRequest.of(page, size);
         Page<Listing> listings = listingService.searchListings(request, pageable);
-        
-        System.out.println("Search results: " + listings.getTotalElements() + " total, " + listings.getContent().size() + " in page");
-        
         return ResponseEntity.ok(listings);
     }
 
@@ -229,4 +223,4 @@ public class ListingController {
         public String getComment() { return comment; }
         public void setComment(String comment) { this.comment = comment; }
     }
-} 
+}

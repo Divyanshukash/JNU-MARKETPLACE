@@ -3,7 +3,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
+  phoneNumber?: string;
   bio?: string;
   profilePicture?: string;
   role: UserRole;
@@ -127,7 +127,7 @@ export interface AuthRequest {
   password: string;
   firstName?: string;
   lastName?: string;
-  phone?: string;
+  phoneNumber?: string;
 }
 
 export interface AuthResponse {
@@ -145,17 +145,27 @@ export interface ListingRequest {
   price: number;
   negotiable: boolean;
   images: string[];
-  location: Location;
+  location?: string;
+  originalPrice?: number;
+  subCategory?: string;
+  tags?: string[];
+  hostelBlock?: string;
+  roomNumber?: string;
+  isDonation?: boolean;
+  lifeOfItem?: string;
 }
 
 export interface SearchRequest {
-  query?: string;
+  keyword?: string;
   category?: string;
+  subCategory?: string;
   minPrice?: number;
   maxPrice?: number;
   condition?: string;
   location?: string;
-  sortBy?: 'price' | 'date' | 'relevance';
+  tags?: string[];
+  sellerId?: string;
+  sortBy?: 'createdAt' | 'updatedAt' | 'price' | 'views' | 'favorites' | 'title';
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -173,4 +183,4 @@ export interface PaginatedResponse<T> {
   number: number;
   first: boolean;
   last: boolean;
-} 
+}

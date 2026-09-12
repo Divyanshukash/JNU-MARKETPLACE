@@ -72,6 +72,7 @@ const Search: React.FC = () => {
   const [conditions, setConditions] = useState<string[]>([]);
   const [listings, setListings] = useState<any[]>([]);
   const [filters, setFilters] = useState({ category: '', minPrice: '', maxPrice: '', condition: '' });
+  const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(false);
   const [soldItems, setSoldItems] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
@@ -80,47 +81,34 @@ const Search: React.FC = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const query = params.get('query');
+    const query = params.get('query') || params.get('q');
     if (query && query.trim()) {
-      fetchQueryListings(query.trim());
+      const normalizedQuery = query.trim();
+      setKeyword(normalizedQuery);
+      fetchListings({ ...filters, keyword: normalizedQuery });
     } else {
+      setKeyword('');
       api.get('/listings/categories')
         .then(res => setCategories(res.data))
         .catch(() => setCategories([]));
       api.get('/listings/conditions')
         .then(res => setConditions(res.data))
         .catch(() => setConditions([]));
-      fetchAllListings();
+      fetchListings({ ...filters, keyword: '' });
     }
     // eslint-disable-next-line
   }, [location.search]);
 
-  const fetchAllListings = () => {
+  const fetchListings = (filterParams: typeof filters & { keyword?: string }) => {
     setLoading(true);
-    api.get('/listings', { params: { page: 0, size: 40 } })
-      .then(res => {
-        const listingsData = res.data.content || [];
-        setListings(listingsData);
-        // Check sold status for all listings
-        if (listingsData.length > 0) {
-          checkSoldStatus(listingsData.map((l: any) => l.id));
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setListings([]);
-        setLoading(false);
-      });
-  };
-
-  const fetchFilteredListings = (filterParams: typeof filters) => {
-    setLoading(true);
-    
-    // Build the search request object - match the working approach from Home page
     const searchRequest: any = {};
-    
+
+    if (filterParams.keyword?.trim()) {
+      searchRequest.keyword = filterParams.keyword.trim();
+    }
+
     if (filterParams.category) {
-      searchRequest.category = filterParams.category.toUpperCase();
+      searchRequest.category = categoryDisplayToEnum[filterParams.category] || filterParams.category.toUpperCase();
     }
     
     if (filterParams.condition) {
@@ -136,13 +124,10 @@ const Search: React.FC = () => {
       searchRequest.maxPrice = parseFloat(filterParams.maxPrice);
     }
 
-    console.log('Sending search request:', searchRequest);
-
     api.post('/listings/search', searchRequest, {
       params: { page: 0, size: 40 },
     })
       .then(res => {
-        console.log('Search response:', res.data);
         const listingsData = res.data.content || [];
         setListings(listingsData);
         // Check sold status for filtered listings
@@ -158,48 +143,17 @@ const Search: React.FC = () => {
       });
   };
 
-  const fetchQueryListings = (query: string) => {
-    setLoading(true);
-    api.post('/listings/search', {
-      keyword: query,
-    }, {
-      params: { page: 0, size: 40 },
-    })
-      .then(res => {
-        const listingsData = res.data.content || [];
-        setListings(listingsData);
-        // Check sold status for search results
-        if (listingsData.length > 0) {
-          checkSoldStatus(listingsData.map((l: any) => l.id));
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setListings([]);
-        setLoading(false);
-      });
-  };
-
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     const newFilters = { ...filters, [name]: value };
     setFilters(newFilters);
     
-    console.log('Filter changed:', { name, value, newFilters });
-    
-    // If all filters are empty, fetch all listings
-    if (!newFilters.category && !newFilters.minPrice && !newFilters.maxPrice && !newFilters.condition) {
-      console.log('No filters applied, fetching all listings');
-      fetchAllListings();
-    } else {
-      console.log('Filters applied, fetching filtered listings');
-      fetchFilteredListings(newFilters);
-    }
+    fetchListings({ ...newFilters, keyword });
   };
 
   const clearFilters = () => {
     setFilters({ category: '', minPrice: '', maxPrice: '', condition: '' });
-    fetchAllListings();
+    fetchListings({ category: '', minPrice: '', maxPrice: '', condition: '', keyword });
   };
 
   // Check sold status for listings
@@ -340,4 +294,6 @@ const Search: React.FC = () => {
   );
 };
 
+
 export default Search; 
+
