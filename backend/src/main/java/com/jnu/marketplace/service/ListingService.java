@@ -2,6 +2,7 @@ package com.jnu.marketplace.service;
 
 import com.jnu.marketplace.dto.ListingRequest;
 import com.jnu.marketplace.dto.SearchRequest;
+import com.jnu.marketplace.event.ListingChangedEvent;
 import com.jnu.marketplace.model.Listing;
 import com.jnu.marketplace.model.Listing.ListingStatus;
 import com.jnu.marketplace.model.User;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +38,7 @@ public class ListingService {
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Listing createListing(ListingRequest request) {
         if (request.getDonation()) {
@@ -57,7 +60,9 @@ public class ListingService {
         listing.setSellerId(user.getId());
         listing.setSellerName(user.getFirstName() + " " + user.getLastName());
         listing.setStatus(ListingStatus.ACTIVE);
-        return listingRepository.save(listing);
+        Listing saved = listingRepository.save(listing);
+        eventPublisher.publishEvent(new ListingChangedEvent(saved.getId()));
+        return saved;
     }
 
     public Listing updateListing(String id, ListingRequest request) {
@@ -85,7 +90,9 @@ public class ListingService {
 
         applyListingRequest(listing, request, true);
 
-        return listingRepository.save(listing);
+        Listing saved = listingRepository.save(listing);
+        eventPublisher.publishEvent(new ListingChangedEvent(saved.getId()));
+        return saved;
     }
 
     public void deleteListing(String id) {
@@ -103,6 +110,7 @@ public class ListingService {
         }
 
         listingRepository.delete(listing);
+        eventPublisher.publishEvent(new ListingChangedEvent(id));
     }
 
     public Listing getListingById(String id) {
@@ -156,7 +164,7 @@ public class ListingService {
     private void applyListingRequest(Listing listing, ListingRequest request, boolean preserveMissingOptionalValues) {
         listing.setTitle(request.getTitle());
         listing.setDescription(request.getDescription());
-        listing.setCategory(parseCategory(request.getCategory()));
+        listing.setCategory(request.getCategory());
         listing.setCondition(request.getCondition());
         listing.setPrice(request.getPrice());
         listing.setNegotiable(request.isNegotiable());
@@ -252,6 +260,7 @@ public class ListingService {
 
         listing.setStatus(status);
         listingRepository.save(listing);
+        eventPublisher.publishEvent(new ListingChangedEvent(id));
     }
 
     public List<Listing> getFeaturedListings() {

@@ -1,5 +1,6 @@
 package com.jnu.marketplace.service;
 
+import com.jnu.marketplace.event.ListingChangedEvent;
 import com.jnu.marketplace.model.Listing;
 import com.jnu.marketplace.model.Sale;
 import com.jnu.marketplace.model.User;
@@ -7,6 +8,7 @@ import com.jnu.marketplace.repository.ListingRepository;
 import com.jnu.marketplace.repository.SaleRepository;
 import com.jnu.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final ListingRepository listingRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Mark an item as sold and create a sale record
@@ -73,7 +76,8 @@ public class SaleService {
         listing.setStatus(Listing.ListingStatus.SOLD);
         listing.setUpdatedAt(LocalDateTime.now());
         listingRepository.save(listing);
-        
+        eventPublisher.publishEvent(new ListingChangedEvent(listing.getId()));
+
         // Update user statistics
         updateUserStatistics(seller.getId(), buyer.getId(), salePrice);
         
@@ -192,7 +196,8 @@ public class SaleService {
                 .orElseThrow(() -> new RuntimeException("Listing not found"));
         listing.setStatus(Listing.ListingStatus.ACTIVE);
         listingRepository.save(listing);
-        
+        eventPublisher.publishEvent(new ListingChangedEvent(listing.getId()));
+
         return saleRepository.save(sale);
     }
 

@@ -56,6 +56,7 @@ public class SecurityConfig {
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/listings", "/api/listings/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/listings/search").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/ai/search").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/listings/categories").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/listings/conditions").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")

@@ -124,9 +124,15 @@ const Search: React.FC = () => {
       searchRequest.maxPrice = parseFloat(filterParams.maxPrice);
     }
 
-    api.post('/listings/search', searchRequest, {
-      params: { page: 0, size: 40 },
-    })
+    // Keyword queries go to the AI endpoint, which handles its own fallback to conventional search.
+    // If that call fails outright, retry the existing endpoint.
+    const postSearch = (path: string) =>
+      api.post(path, searchRequest, { params: { page: 0, size: 40 } });
+    const request = searchRequest.keyword
+      ? postSearch('/ai/search').catch(() => postSearch('/listings/search'))
+      : postSearch('/listings/search');
+
+    request
       .then(res => {
         const listingsData = res.data.content || [];
         setListings(listingsData);
