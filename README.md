@@ -1,10 +1,3 @@
-````markdown
-# 🛒 JNU Marketplace
-
-A full-stack marketplace web application developed for the Jawaharlal Nehru University (JNU) community, enabling students, faculty, and staff to securely buy and sell products within the campus ecosystem.
-
----
-
 ## 🚀 Live Demo
 
 **Frontend:** https://jnu-marketplace.vercel.app
@@ -15,23 +8,27 @@ A full-stack marketplace web application developed for the Jawaharlal Nehru Univ
 
 ## 📌 Overview
 
-JNU Marketplace provides a secure and user-friendly platform for buying and selling items inside the university community. Users can create listings, communicate with buyers and sellers, manage sale requests, and securely authenticate using JWT.
+JNU Marketplace is a secure campus marketplace that allows users to create listings, discover products, communicate with buyers and sellers, manage sale requests, and complete transactions.
 
-The project follows a modern client-server architecture built with **React**, **Spring Boot**, and **MongoDB Atlas**.
+The application follows a client-server architecture built with **React, Spring Boot, and MongoDB**, with an AI-powered semantic search layer using **OpenAI embeddings and Qdrant**.
+
+The search system combines semantic similarity with traditional lexical relevance, freshness, and listing quality to provide more relevant results while maintaining a conventional keyword-search fallback when AI services are unavailable.
 
 ---
 
 ## ✨ Features
 
-### Authentication & Security
+### 🔐 Authentication & Security
 
 - JWT-based Authentication
 - Secure User Registration & Login
 - Password Encryption using Spring Security
-- Protected API Endpoints
+- Protected REST API Endpoints
 - Role-based Access Control
+- Environment-based secret configuration
+- Secure fallback when AI services are unavailable
 
-### Marketplace
+### 🛍 Marketplace
 
 - Create, Update and Delete Listings
 - Upload Multiple Product Images
@@ -39,272 +36,312 @@ The project follows a modern client-server architecture built with **React**, **
 - Advanced Search and Filtering
 - Wishlist Management
 - Product Detail Pages
+- Sale Request Management
+- Listing status management
 
-### Communication
+### 🤖 AI-Powered Search
+
+- Semantic search using vector embeddings
+- OpenAI embedding integration
+- Qdrant vector database for similarity retrieval
+- Hybrid ranking combining:
+  - Semantic similarity
+  - Lexical relevance
+  - Listing freshness
+  - Listing quality
+- MongoDB remains the source of truth for listing data
+- Automatic validation of Qdrant results against MongoDB
+- Graceful fallback to conventional keyword search when AI services are unavailable
+- Deterministic ranking for consistent results
+- Asynchronous listing indexing after marketplace changes
+
+### 💬 Communication
 
 - Buyer-Seller Messaging
 - Sale Request Management
 - Email Notifications
 
-### User Experience
+### 🎨 User Experience
 
 - Responsive Design
 - Light & Dark Theme
 - Image Gallery
 - Pagination
 - Modern Dashboard
+- Existing marketplace UI integrated with AI search without requiring a separate AI interface
 
 ---
 
-## 🛠 Tech Stack
+## 🧠 AI Search Architecture
 
-| Category | Technologies |
-|-----------|--------------|
-| Frontend | React 18, TypeScript, Tailwind CSS, React Router, React Query, Axios |
-| Backend | Spring Boot 3, Java 17 |
-| Security | Spring Security, JWT |
-| Database | MongoDB Atlas |
-| File Storage | Local File Uploads |
-| Documentation | Swagger/OpenAPI |
-| Build Tools | Maven, npm |
-| Version Control | Git & GitHub |
-
----
-
-## 🏗 Architecture
+The AI search system uses a retrieval-and-ranking architecture rather than an LLM chatbot.
 
 ```text
-                 React + TypeScript
-                        │
-                 REST API (Axios)
-                        │
-              Spring Boot Backend
-      ┌─────────────┼─────────────┐
-      │             │             │
- Authentication  Listings   Messaging
-      │             │             │
-      └─────────────┼─────────────┘
+                    User Search Query
+                           │
+                           ▼
+                    React Search UI
+                           │
+                           ▼
+                 AiSearchController
+                           │
+                           ▼
+                    AiSearchService
+                           │
+                 ┌─────────┴─────────┐
+                 │                   │
+                 ▼                   ▼
+          OpenAI Embeddings     Search Filters
+                 │
+                 ▼
+            Query Vector
+                 │
+                 ▼
+               Qdrant
+                 │
+          Candidate Listings
+          + Similarity Scores
+                 │
+                 ▼
+              MongoDB
+        Canonical Listing Data
+                 │
+                 ▼
+          Eligibility Filtering
+                 │
+        ┌────────┼─────────┐
+        ▼        ▼         ▼
+     Lexical  Freshness  Quality
+      Score      Score      Score
+        │        │         │
+        └────────┼─────────┘
+                 ▼
+            Hybrid Ranker
+                 │
+                 ▼
+          Ranked Listings
+                 │
+                 ▼
+              React UI
+
+Hybrid Ranking
+Search results are ranked using:
+Final Score =
+    0.70 × Semantic Similarity
+  + 0.15 × Lexical Relevance
+  + 0.10 × Freshness
+  + 0.05 × Listing Quality
+
+This allows the system to understand search intent while still preserving the importance of exact terms and marketplace-specific signals.
+📦 AI Listing Indexing
+Listings are asynchronously indexed whenever relevant marketplace changes occur.
+Listing Created / Updated / Status Changed
                     │
-              MongoDB Atlas
-````
+                    ▼
+          ListingChangedEvent
+                    │
+                    ▼
+          AFTER_COMMIT + @Async
+                    │
+                    ▼
+        ListingIndexingListener
+                    │
+                    ▼
+        ListingIndexingService
+                    │
+                    ▼
+          Listing Text Assembly
+                    │
+                    ▼
+             SHA-256 Hash
+                    │
+                    ▼
+          OpenAI Embedding
+                    │
+                    ▼
+               Qdrant
 
----
+MongoDB remains the authoritative source of listing information while Qdrant stores the vector representation and retrieval metadata.
+Content hashing prevents unnecessary re-embedding when searchable listing content has not changed.
+🔄 AI Reliability & Fallback
+AI services are treated as an enhancement rather than a dependency of the marketplace.
+If any of the following occurs:
+- AI is disabled
+- Embedding provider is unavailable
+- Embedding request fails
+- Embedding dimension is invalid
+- Qdrant is unavailable
+- Qdrant search fails
+- No eligible semantic candidates are found
+the application falls back to the existing conventional keyword-search implementation.
+             AI Search
+                 │
+        ┌────────┴────────┐
+        │                 │
+     Success            Failure
+        │                 │
+        ▼                 ▼
+ Hybrid Ranking      Keyword Search
+        │                 │
+        └────────┬────────┘
+                 ▼
+            Search Results
 
-## 📁 Project Structure
+This ensures that an AI-service outage does not make the marketplace unavailable.
+🏗 System Architecture
+                    React + TypeScript
+                           │
+                      Axios / REST
+                           │
+                           ▼
+                 Spring Boot Backend
+                           │
+       ┌───────────────────┼───────────────────┐
+       │                   │                   │
+       ▼                   ▼                   ▼
+ Authentication         Listings          Messaging
+       │                   │                   │
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                     MongoDB Atlas
+                           │
+                           │
+                 ┌─────────┴─────────┐
+                 │                   │
+                 ▼                   ▼
+            AI Search           Marketplace
+                 │
+          ┌──────┴──────┐
+          │             │
+          ▼             ▼
+   OpenAI Embeddings   Qdrant
+          │             │
+          └──────┬──────┘
+                 ▼
+           Hybrid Ranking
 
-```text
-JNU-MARKETPLACE
+🛠 Tech Stack
+Category	Technologies
+Frontend	React 18, TypeScript, Tailwind CSS, React Router, React Query, Axios
+Backend	Spring Boot 3, Java 17
+Security	Spring Security, JWT
+Database	MongoDB / MongoDB Atlas
+AI / Embeddings	OpenAI Embeddings
+Vector Database	Qdrant
+Search	Semantic Search + Lexical Search + Hybrid Ranking
+File Storage	Local File Uploads
+API	REST APIs
+Documentation	Swagger / OpenAPI
+Build Tools	Maven, npm
+Testing	JUnit, Mockito
+Version Control	Git & GitHub
+Deployment	Vercel, Render
+
+
+🔒 Security
+- JWT-based authentication
+- Spring Security authorization
+- Password encryption
+- Protected REST endpoints
+- Environment-based configuration for secrets
+- No API keys or credentials hardcoded in source configuration
+- AI provider failures do not expose infrastructure details to clients
+Sensitive configuration should be supplied through environment variables.
+🧪 Testing
+The backend contains unit and controller tests covering:
+- AI configuration
+- Embedding generation
+- Content hashing
+- Listing indexing
+- Qdrant vector operations
+- Semantic search
+- Lexical scoring
+- Freshness scoring
+- Listing quality scoring
+- Hybrid ranking
+- Search fallback behavior
+- Controller behavior
+- Security configuration
+- Listing lifecycle events
+The current implementation passes:
+130 backend tests
+0 failures
+
+The backend also builds successfully with Maven, and the frontend production build succeeds.
+⚠️ Current Limitations
+- Live OpenAI + Qdrant + MongoDB end-to-end verification depends on external service configuration.
+- Semantic search uses a bounded candidate pool rather than calculating a complete semantic catalog count.
+- Failed indexing currently requires a later lifecycle event or explicit synchronization to retry.
+- Ranking is deterministic and rule-based; no learned ranking model is currently used.
+- Recommendations and LLM-based functionality are intentionally outside the current scope.
+📁 Project Structure
+JNU-MARKETPLACE/
 │
-├── backend
-│   ├── src
-│   ├── uploads
-│   └── pom.xml
+├── backend/
+│   ├── src/main/java/com/jnu/marketplace/
+│   │   ├── ai/
+│   │   │   ├── embedding/
+│   │   │   ├── indexing/
+│   │   │   ├── search/
+│   │   │   └── vector/
+│   │   │
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── event/
+│   │   ├── model/
+│   │   ├── repository/
+│   │   ├── security/
+│   │   └── service/
+│   │
+│   └── src/test/
 │
-├── frontend
-│   ├── public
-│   ├── src
-│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── types/
+│   │
+│   └── public/
 │
-├── LOCAL-SETUP.md
 └── README.md
-```
 
----
-
-## ⚙️ Getting Started
-
-### Prerequisites
-
-* Java 17+
-* Node.js 18+
-* MongoDB Atlas (or Local MongoDB)
-* Maven
-* Git
-
-### Clone Repository
-
-```bash
-git clone https://github.com/Divyanshukash/JNU-MARKETPLACE.git
-cd JNU-MARKETPLACE
-```
-
----
-
-### Backend Setup
-
-```bash
+🚀 Running Locally
+Backend
 cd backend
-mvn clean install
 mvn spring-boot:run
-```
 
-Backend runs at:
-
-```
-http://localhost:8080
-```
-
----
-
-### Frontend Setup
-
-```bash
+Configure the required environment variables before starting the application.
+Frontend
 cd frontend
 npm install
 npm start
-```
 
-Frontend runs at:
-
-```
-http://localhost:3000
-```
-
----
-
-## 🔧 Environment Variables
-
-### Backend (`application.properties`)
-
-```properties
-spring.data.mongodb.uri=YOUR_MONGODB_URI
-
-jwt.secret=YOUR_SECRET
-
-spring.mail.username=YOUR_EMAIL
-spring.mail.password=YOUR_APP_PASSWORD
-```
-
-### Frontend (`.env`)
-
-```properties
-REACT_APP_API_URL=http://localhost:8080/api
-```
-
----
-
-## 📚 REST API
-
-| Method | Endpoint             | Description    |
-| ------ | -------------------- | -------------- |
-| POST   | `/api/auth/register` | Register User  |
-| POST   | `/api/auth/login`    | Login          |
-| GET    | `/api/listings`      | Get Listings   |
-| POST   | `/api/listings`      | Create Listing |
-| PUT    | `/api/listings/{id}` | Update Listing |
-| DELETE | `/api/listings/{id}` | Delete Listing |
-| GET    | `/api/users/profile` | User Profile   |
-
-Swagger Documentation:
-
-```
-http://localhost:8080/swagger-ui.html
-```
-
----
-
-## 📷 Screenshots
-
-> Add screenshots here after deployment.
-
-```
-assets/
-├── home.png
-├── listings.png
-├── details.png
-├── dashboard.png
-└── chat.png
-```
-
----
-
-## 🚀 Deployment
-
-| Service  | Platform      |
-| -------- | ------------- |
-| Frontend | Vercel        |
-| Backend  | Render        |
-| Database | MongoDB Atlas |
-
----
-
-## 🔒 Security
-
-* JWT Authentication
-* BCrypt Password Hashing
-* Protected REST APIs
-* Secure File Uploads
-* Input Validation
-* Spring Security
-
----
-
-## 🧪 Testing
-
-Backend
-
-```bash
-cd backend
-mvn test
-```
-
+The frontend communicates with the Spring Boot REST API through Axios.
+👨‍💻 Development
 Frontend
+React + TypeScript
+       │
+       ▼
+REST APIs
+       │
+       ▼
+Spring Boot
+       │
+       ├── MongoDB
+       │
+       ├── OpenAI Embeddings
+       │
+       └── Qdrant
 
-```bash
-cd frontend
-npm test
-```
-
----
-
-## 🎯 Future Enhancements
-
-* Payment Gateway Integration
-* Product Reviews & Ratings
-* Real-time Chat using WebSockets
-* Push Notifications
-* Admin Dashboard
-* AI-powered Product Recommendations
-* Mobile Application
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-
-```bash
-git checkout -b feature/new-feature
-```
-
-3. Commit your changes
-
-```bash
-git commit -m "Add new feature"
-```
-
-4. Push your branch
-
-```bash
-git push origin feature/new-feature
-```
-
-5. Open a Pull Request
-
----
-
-## 👨‍💻 Author
-
-**Divyanshu Kashyap**
-
-GitHub: https://github.com/Divyanshukash
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-```
-```
+The project uses Git and GitHub for version control and follows a modular service-oriented backend structure.
+📌 Future Improvements
+Potential future improvements include:
+- Automatic retry/reconciliation for failed vector indexing
+- Improved semantic pagination
+- Search analytics and interaction tracking
+- Learning-to-rank using sufficient interaction data
+- Personalized recommendations
+- Offline evaluation of semantic search quality
+- Additional vector-store filtering and indexing optimizations
